@@ -11,9 +11,9 @@
 
 #include "DebugHelp.hpp"
 
+/*
 auto isOdd = [](int candidate) {return candidate % 2 != 0; };
 // [] can capture specific variables or all
-/*
  [x,y] – capture x and y by value
 - Copies are made
 - Lambda can be used when x and y have gone

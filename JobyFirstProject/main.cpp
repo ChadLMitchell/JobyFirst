@@ -9,6 +9,7 @@
 #include "DebugHelp.hpp"
 #include "CmdLineMenus.hpp"
 #include "MenuGroupWithAllOption.hpp"
+#include "Plane.hpp"
 using namespace std;
 
 using TestFuncPtr = bool (*)(int selector);
@@ -73,6 +74,8 @@ MenuGroup mainMenu = MenuGroup(mainMenus);
 
 int main(int argc, const char * argv[]) {
     debugMessage("Start program!");
+
+    testPlane();
 
     mainMenu.runMenu();
     
