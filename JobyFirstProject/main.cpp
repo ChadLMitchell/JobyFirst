@@ -14,6 +14,9 @@ using namespace std;
 
 using TestFuncPtr = bool (*)(int selector);
 
+bool testPlaneClass(int selector) {
+    return testPlane(true);
+}
 bool test(int selector) {
     string message = "===> ran test " + to_string(selector);
     debugMessage(message);
@@ -21,7 +24,7 @@ bool test(int selector) {
 }
 
 vector<TestFuncPtr> tests {
-    test, // test 1
+    testPlaneClass, // test 1
     test, // test 2
     test, // test 3
     test, // test 4
@@ -46,7 +49,7 @@ bool doMainMenu(int selector, MenuGroup &thisMenuGroup) {
 }
 
 vector<MenuItem> testMenus {
-    MenuItem('1', string{"Run Test 1"}, &runTest, 1),
+    MenuItem('1', string{"Test Plane Class"}, &runTest, 1),
     MenuItem('2', string{"Run Test 2"}, &runTest, 2),
     MenuItem('3', string{"Run Test 3"}, &runTest, 3),
     MenuItem('4', string{"Run Test 4"}, &runTest, 4),
@@ -74,8 +77,6 @@ MenuGroup mainMenu = MenuGroup(mainMenus);
 
 int main(int argc, const char * argv[]) {
     debugMessage("Start program!");
-
-    testPlane();
 
     mainMenu.runMenu();
     

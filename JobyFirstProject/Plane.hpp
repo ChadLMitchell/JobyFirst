@@ -11,14 +11,17 @@
 #include <stdio.h>
 #include <iostream>
 
-enum class Company {
+enum Company {
     Alpha = 0,
     Bravo,
     Charlie,
     Delta,
     Echo
 };
+const Company minCompany{Alpha};
+const Company maxCompany{Echo};
 extern const char *companyNames[];
+const char *companyName(Company c);
 
 // Specifications provided by the task
 struct Specification {
@@ -41,6 +44,7 @@ public:
     Plane(Specification &spec);
     ~Plane();
     Company getCompany();
+    const char *getCompanyName();
     double distanceFullCharge__miles(); // calculated value
     long timeFullCharge__seconds(); // calculated value
     double meanTimeBetweenFaults(); // calculated value
@@ -51,6 +55,8 @@ public:
     long getFaultCount();
 };
 
+bool validateSpecs(Specification &spec);
+const double allowedPercentDiffFromMTBF{2.0};
 bool testPlane(bool verbose = true);
 
 #endif /* Plane_hpp */
