@@ -38,25 +38,22 @@ class Plane {
     Specification mySpecs;
 
     long nextFaultInterval; // seconds
-    long faultCount;
     
 public:
     Plane(Specification &spec);
     ~Plane();
     Company getCompany();
     const char *getCompanyName();
-    double distanceFullCharge__miles(); // calculated value
-    long timeFullCharge__seconds(); // calculated value
-    double meanTimeBetweenFaults(); // calculated value
+    long calcTimeToCharge__seconds();
+    double calcDistanceFullCharge__miles(); // calculated value
+    long calcTimeOnFullCharge__seconds(); // calculated value
+    double calcMeanTimeBetweenFaults(); // calculated value
     long getNextFaultInterval();
     long decrementNextFaultLinterval(long seconds);
     long createFaultInterval();
-    void recordFault();
-    long getFaultCount();
 };
 
 bool validateSpecs(Specification &spec);
-const double allowedPercentDiffFromMTBF{2.0};
 bool testPlane(bool verbose = true);
 
 #endif /* Plane_hpp */

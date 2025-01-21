@@ -74,7 +74,6 @@ Plane::Plane(Specification &spec): mySpecs(spec) {
         throw std::runtime_error("Attempt to create plane with invalid specifications");
     }
     createFaultInterval();
-    faultCount = 0;
 }
 Plane::~Plane() {
 }
@@ -84,13 +83,16 @@ Company Plane::getCompany(){
 const char *Plane::getCompanyName(){
     return companyName(mySpecs.theCompany);
 }
-double Plane::distanceFullCharge__miles() {
+long Plane::calcTimeToCharge__seconds() {
+    return mySpecs.time_to_charge__hours * 60 * 60;
+}
+double Plane::calcDistanceFullCharge__miles() {
     return mySpecs.battery_capacity__kWh / mySpecs.energy_use__kWh_per_mile;
 }
-long Plane::timeFullCharge__seconds() {
-    return lround(distanceFullCharge__miles()*360 / mySpecs.cruise_speed__mph);
+long Plane::calcTimeOnFullCharge__seconds() {
+    return lround(calcDistanceFullCharge__miles()*360 / mySpecs.cruise_speed__mph);
 }
-double Plane::meanTimeBetweenFaults() {
+double Plane::calcMeanTimeBetweenFaults() {
     return 360/mySpecs.probability_fault__per_hour;
 }
 long Plane::getNextFaultInterval() {
@@ -105,16 +107,13 @@ long Plane::createFaultInterval() {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> distrib(0, 1);
     double random0to1 = distrib(gen);
-    if (random0to1 == 0) { random0to1 = 1; };
+    if (random0to1 == 0) { random0to1 = 0.1; }; // avoid log 0
+    if (random0to1 == 1) { random0to1 = 0.9; }; // avoid log 1
     nextFaultInterval = -std::log(random0to1) * 360 / mySpecs.probability_fault__per_hour;
     return nextFaultInterval;
 }
-void Plane::recordFault() {
-    faultCount++;
-}
-long Plane::getFaultCount() {
-    return faultCount;
-}
+
+const double allowedPercentDiffFromMTBF{3.0};
 
 bool testPlane(bool verbose) {
     bool returnValue = true;
@@ -137,9 +136,9 @@ bool testPlane(bool verbose) {
             }
             double averageFaultInterval = accumFaultCount/tries;
             if(verbose) {
-                std::cout  << companyName(aSpec.theCompany) << " MTBF from Spec: " << testPlane.meanTimeBetweenFaults() << " Average Simulated Fault Interval (seconds): " << averageFaultInterval << std::endl;
+                std::cout  << companyName(aSpec.theCompany) << " MTBF from Spec: " << testPlane.calcMeanTimeBetweenFaults() << " Average Simulated Fault Interval (seconds): " << averageFaultInterval << std::endl;
             }
-            double percentDiff = abs(testPlane.meanTimeBetweenFaults() - averageFaultInterval)/testPlane.meanTimeBetweenFaults() * 100;
+            double percentDiff = abs(testPlane.calcMeanTimeBetweenFaults() - averageFaultInterval)/testPlane.calcMeanTimeBetweenFaults() * 100;
             if(percentDiff > allowedPercentDiffFromMTBF) {
                 if(verbose) {
                     std::cout << "Error: " << companyName(aSpec.theCompany) << " Difference between Simulated Average Interval and MTBF: " << percentDiff << "% > " << allowedPercentDiffFromMTBF << "% (allowed difference)" << std::endl;

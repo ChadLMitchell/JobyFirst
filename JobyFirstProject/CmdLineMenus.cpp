@@ -32,7 +32,7 @@ int MenuItem::getSelector() { // does the character match the selector for this 
     return selector;
 }
 void MenuItem::printItem() { // print the menu item
-    cout << menuSelect << ": " << menuText << endl;
+    cout << "  " << menuSelect << ": " << menuText << endl;
 }
 
 MenuGroup::MenuGroup(vector<MenuItem> &someMenus): theMenus(someMenus) {

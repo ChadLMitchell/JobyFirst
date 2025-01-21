@@ -10,12 +10,36 @@
 #include "CmdLineMenus.hpp"
 #include "MenuGroupWithAllOption.hpp"
 #include "Plane.hpp"
+#include "SimClock.hpp"
 using namespace std;
 
 using TestFuncPtr = bool (*)(int selector);
 
 bool testPlaneClass(int selector) {
-    return testPlane(true);
+    if(testPlane(true)) {
+        cout << "Test of Plane Class passed" << endl;
+    } else {
+        cout << "Test of Plane Class failed" << endl;
+    }
+    return false;
+}
+const long longTestClockSeconds{60*60*3}; //3 hours
+const long shortTestClockSeconds{60}; //1 minute
+bool shortTestSimClockClass(int selector) {
+    if(testSimClock(shortTestClockSeconds)) {
+        cout << "Test of SimClock Class passed" << endl;
+    } else {
+        cout << "Test of SimClock Class failed" << endl;
+    }
+    return false;
+}
+bool longTestSimClockClass(int selector) {
+    if(testSimClock(longTestClockSeconds)) {
+        cout << "Test of SimClock Class passed" << endl;
+    } else {
+        cout << "Test of SimClock Class failed" << endl;
+    }
+    return false;
 }
 bool test(int selector) {
     string message = "===> ran test " + to_string(selector);
@@ -25,8 +49,8 @@ bool test(int selector) {
 
 vector<TestFuncPtr> tests {
     testPlaneClass, // test 1
-    test, // test 2
-    test, // test 3
+    shortTestSimClockClass, // test 2
+    longTestSimClockClass, // test 3
     test, // test 4
     test  // test 5
 };
@@ -50,8 +74,8 @@ bool doMainMenu(int selector, MenuGroup &thisMenuGroup) {
 
 vector<MenuItem> testMenus {
     MenuItem('1', string{"Test Plane Class"}, &runTest, 1),
-    MenuItem('2', string{"Run Test 2"}, &runTest, 2),
-    MenuItem('3', string{"Run Test 3"}, &runTest, 3),
+    MenuItem('2', string{"Short Test Sim Clock"}, &runTest, 2),
+    MenuItem('3', string{"Long Test Sim Clock"}, &runTest, 3),
     MenuItem('4', string{"Run Test 4"}, &runTest, 4),
     MenuItem('5', string{"Run Test 5"}, &runTest, 5),
     MenuItem('A', string{"Run All Tests"}, &runAllTests, 0),
@@ -79,6 +103,6 @@ int main(int argc, const char * argv[]) {
     debugMessage("Start program!");
 
     mainMenu.runMenu();
-    
+
     return 0;
 }
