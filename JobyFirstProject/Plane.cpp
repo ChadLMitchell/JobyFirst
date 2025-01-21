@@ -67,12 +67,14 @@ bool validateSpecs(Specification &spec) {
     return returnValue;
 }
 
+int Plane::NextPlaneNumber = 1;
 Plane::Plane(Specification &spec): mySpecs(spec) {
     // Avoid divide by 0 and other silly errors
     // We should validate specs before creating Plane, this is extra checking
     if(!validateSpecs(mySpecs)) {
         throw std::runtime_error("Attempt to create plane with invalid specifications");
     }
+    planeNumber = NextPlaneNumber++;
     createFaultInterval();
 }
 Plane::~Plane() {
@@ -82,6 +84,13 @@ Company Plane::getCompany(){
 }
 const char *Plane::getCompanyName(){
     return companyName(mySpecs.theCompany);
+}
+int Plane::getPlaneNumber() {
+    return planeNumber;
+}
+const std::string Plane::describe(){
+    std::string description = "plane #" + std::to_string(planeNumber) + " from " + getCompanyName();
+    return description;
 }
 long Plane::calcTimeToCharge__seconds() {
     return mySpecs.time_to_charge__hours * 60 * 60;
@@ -116,6 +125,11 @@ long Plane::calcPassengerCount() {
     return mySpecs.passenger_count;
     // NEED TO RESPOND TO SETTINGS TO DO *******************************************
 }
+std::shared_ptr<Plane> Plane::getRandomPlane() {
+    return std::make_shared<Plane>(specifications[0]);
+}
+
+
 const double allowedPercentDiffFromMTBF{3.0};
 
 bool testPlane(bool verbose) {

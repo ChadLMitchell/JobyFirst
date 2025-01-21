@@ -20,6 +20,7 @@ struct Charger {
 class ChargerQueue: public EventHandler {
     Simulation *theSimulation;
     long chargerCount;
+    bool verboseTesting;
     std::vector<Charger> chargers;
     std::queue<std::shared_ptr<Plane>> planesWaiting;
         // TO DO: consider using a list for performance later
@@ -28,6 +29,9 @@ public:
     virtual ~ChargerQueue();
     virtual bool handleEvent(long currentTime);
     void addPlane(long currentTime, std::shared_ptr<Plane> aPlane);
+    void describeQueues(long currentTime);
+    bool isEmpty();
 };
+
 
 #endif /* ChargerQueue_hpp */

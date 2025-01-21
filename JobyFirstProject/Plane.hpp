@@ -36,23 +36,28 @@ struct Specification {
 
 class Plane {
     Specification mySpecs;
-
-    long nextFaultInterval; // seconds
     
+    long nextFaultInterval; // seconds
+    static int NextPlaneNumber;
+    int planeNumber;
 public:
     Plane(Specification &spec);
     ~Plane();
     Company getCompany();
     const char *getCompanyName();
+    int getPlaneNumber();
+    const std::string describe();
     long calcTimeToCharge__seconds();
     double calcDistanceFullCharge__miles(); // calculated value
     long calcTimeOnFullCharge__seconds(); // calculated value
     double calcMeanTimeBetweenFaults(); // calculated value
     long calcPassengerCount();
-
+    
     long getNextFaultInterval();
     long decrementNextFaultLinterval(long seconds);
     long createFaultInterval();
+    
+    static std::shared_ptr<Plane> getRandomPlane();
 };
 
 bool validateSpecs(Specification &spec);
