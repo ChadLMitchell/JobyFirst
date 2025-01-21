@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include "Simulation.hpp"
 
 class EventHandler {
 protected:
@@ -23,8 +24,8 @@ public:
     void setNextEventTime(long aTime);
     virtual bool handleEvent(long currentTime);
 };
-
 class SimClock {
+    Simulation *theSimulation;
     long endTime;
     long currentTime;
     bool needSort;
@@ -32,15 +33,15 @@ class SimClock {
         // TO DO: consider using a list for performance later
     void sortHandlers();
 public:
-    SimClock(long endTime);
+    SimClock(Simulation *theSimulation, long endTime);
     ~SimClock();
     long getTime();
-    bool addHandler(std::shared_ptr<EventHandler> aHandler);
+    void addHandler(std::shared_ptr<EventHandler> aHandler);
+    void reSortHandler(std::shared_ptr<EventHandler> aHandler);
     void markNeedSort();
     bool run();
 };
 
 bool testSimClock(long howLongSeconds);
 
-extern std::shared_ptr<SimClock> theSimClock;
 #endif /* SimClock_hpp */

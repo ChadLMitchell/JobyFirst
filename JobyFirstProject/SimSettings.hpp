@@ -18,4 +18,6 @@ extern int faultOption;
 // 0 = just count faults
 // 1 = fault grounds plan for duration
 
+extern long simulationDuration;
+
 #endif /* SimSettings_hpp */

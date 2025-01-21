@@ -112,7 +112,10 @@ long Plane::createFaultInterval() {
     nextFaultInterval = -std::log(random0to1) * 360 / mySpecs.probability_fault__per_hour;
     return nextFaultInterval;
 }
-
+long Plane::calcPassengerCount() {
+    return mySpecs.passenger_count;
+    // NEED TO RESPOND TO SETTINGS TO DO *******************************************
+}
 const double allowedPercentDiffFromMTBF{3.0};
 
 bool testPlane(bool verbose) {

@@ -19,8 +19,9 @@ class Flight: public EventHandler {
     long passengerCount;
     long faultCount;
     std::shared_ptr<Plane> thePlane;
+    Simulation *theSimulation;
 public:
-    Flight(long startTime, long passengerCount, std::shared_ptr<Plane> aPlane);
+    Flight(Simulation *theSimulation, long startTime, long passengerCount, std::shared_ptr<Plane> aPlane);
     virtual ~Flight();
     virtual bool handleEvent(long currentTime);
     void recordFlight();

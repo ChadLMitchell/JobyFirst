@@ -9,7 +9,8 @@
 #include "Flight.hpp"
 #include "ChargerQueue.hpp"
 
-Flight::Flight(long startTime, long passengerCount, std::shared_ptr<Plane> aPlane): startTime{startTime}, endTime{startTime+aPlane->calcTimeOnFullCharge__seconds()}, nextFaultTime{startTime+aPlane->getNextFaultInterval()}, passengerCount{passengerCount},thePlane{aPlane},EventHandler(std::min(endTime, nextFaultTime)) {
+Flight::Flight(Simulation *theSimulation, long startTime, long passengerCount, std::shared_ptr<Plane> aPlane):
+theSimulation{theSimulation}, startTime{startTime}, endTime{startTime+aPlane->calcTimeOnFullCharge__seconds()}, nextFaultTime{startTime+aPlane->getNextFaultInterval()}, passengerCount{passengerCount},thePlane{aPlane},EventHandler(std::min(endTime, nextFaultTime)) {
     faultCount = 0;
 }
 Flight::~Flight() {
@@ -33,8 +34,8 @@ bool Flight::handleEvent(long currentTime) {
     // finished the flight
     endTime = currentTime; // in case we ended early
     recordFlight();
-    if(theChargerQueue) {
-        theChargerQueue->addPlane(currentTime, thePlane); // "this" will be deleted so the plane now owned by the battery queue
+    if(theSimulation && theSimulation->theChargerQueue) {
+        theSimulation->theChargerQueue->addPlane(currentTime, thePlane); // "this" will be deleted so the plane now owned by the battery queue
     }
     return false; // do not keep us in the event queue
 }

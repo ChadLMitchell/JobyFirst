@@ -6,6 +6,7 @@
 //
 #include <random>
 #include "SimClock.hpp"
+#include "Simulation.hpp"
 
 EventHandler::EventHandler():  nextEventTime{} {
 }
@@ -24,7 +25,8 @@ bool EventHandler::handleEvent(long currentTime) {
     return false;
 }
 
-SimClock::SimClock(long endTime): endTime{endTime}, currentTime{0}, needSort{false} {
+SimClock::SimClock(Simulation *theSimulation, long endTime):
+        theSimulation{theSimulation}, endTime{endTime}, currentTime{0}, needSort{false} {
     eventHandlers = std::vector<std::shared_ptr<EventHandler>>();
 }
 SimClock::~SimClock() {
@@ -32,7 +34,7 @@ SimClock::~SimClock() {
 long SimClock::getTime() {
     return currentTime;
 }
-bool SimClock::addHandler(std::shared_ptr<EventHandler> aHandler) {
+void SimClock::addHandler(std::shared_ptr<EventHandler> aHandler) {
     // Keep eventHandlers sorted with soonest time at the end.
     // Insert the new handler into the first location to keep it sorted.
     auto handlerPtr = begin(eventHandlers);
@@ -40,7 +42,18 @@ bool SimClock::addHandler(std::shared_ptr<EventHandler> aHandler) {
         handlerPtr++;
     }
     eventHandlers.insert(handlerPtr, aHandler);
-    return true;
+}
+void SimClock::reSortHandler(std::shared_ptr<EventHandler> aHandler) {
+    auto handlerPtr = begin(eventHandlers);
+    while(handlerPtr != end(eventHandlers)) {
+        if(*handlerPtr == aHandler) {
+            eventHandlers.erase(handlerPtr);
+            addHandler(aHandler);
+            return;
+        }
+        handlerPtr++;
+    }
+
 }
 void SimClock::markNeedSort()
 {
@@ -127,17 +140,12 @@ long TestHandler::errorCount = 0;
 
 bool testSimClock(long howLongSeconds) {
     std::cout << "Test Sim Clock" << std::endl;
-    bool returnValue = true;
-    SimClock aClock(howLongSeconds);
- 
+    SimClock aClock(nullptr, howLongSeconds);
+//    SimClock aClock(howLongSeconds);
+
     for(int i=0; i<testHandlerCount; i++) {
-        returnValue = aClock.addHandler(std::make_shared<TestHandler>(distribTestHandlerDelay(genTestHandler), distribTestHandlerRepeat(genTestHandler),i + 1)) && returnValue;
-    }
-    if(returnValue) {
-        returnValue = aClock.run();
+        aClock.addHandler(std::make_shared<TestHandler>(distribTestHandlerDelay(genTestHandler), distribTestHandlerRepeat(genTestHandler),i + 1));
     }
     
-    return returnValue;
+    return aClock.run();
 }
-
-std::shared_ptr<SimClock> theSimClock{};

@@ -48,6 +48,8 @@ public:
     double calcDistanceFullCharge__miles(); // calculated value
     long calcTimeOnFullCharge__seconds(); // calculated value
     double calcMeanTimeBetweenFaults(); // calculated value
+    long calcPassengerCount();
+
     long getNextFaultInterval();
     long decrementNextFaultLinterval(long seconds);
     long createFaultInterval();

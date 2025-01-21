@@ -39,3 +39,5 @@ Assumptions
         All planes start in a queue of planes to fly next so they could have a delay, but for now assume the delay is 0.
     Seconds is fine enough ressolution for this simulation so the clock can do seconds allowing mostly integer arithmetic.
     
+Ran into a problem with ChargerQueue. The others are able to handle changes in the sorted Vector of eventHandlers, but if we add something to the Charger Queue, it may need to be resorted. Eventually we added an option to force a full resort of the eventHandlers. There cannot be more than the count of planes so it should not cost too much to resort.
+

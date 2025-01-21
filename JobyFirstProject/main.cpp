@@ -102,6 +102,7 @@ MenuGroup mainMenu = MenuGroup(mainMenus);
 int main(int argc, const char * argv[]) {
     debugMessage("Start program!");
 
+ //   shared_ptr<Simulation> aSimulation = make_shared<Simulation>();
     mainMenu.runMenu();
 
     return 0;
