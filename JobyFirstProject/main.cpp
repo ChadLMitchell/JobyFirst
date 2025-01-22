@@ -11,6 +11,7 @@
 #include "MenuGroupWithAllOption.hpp"
 #include "Plane.hpp"
 #include "SimClock.hpp"
+#include "ChargerQueue.hpp"
 using namespace std;
 
 using TestFuncPtr = bool (*)(int selector);
@@ -41,6 +42,15 @@ bool longTestSimClockClass(int selector) {
     }
     return false;
 }
+bool shortTestChargerQueue(int selector) {
+    testChargerQueueShort();
+    return false;
+}
+bool longTestChargerQueue(int selector) {
+    testChargerQueueLong();
+    return false;
+}
+
 bool test(int selector) {
     string message = "===> ran test " + to_string(selector);
     debugMessage(message);
@@ -51,8 +61,8 @@ vector<TestFuncPtr> tests {
     testPlaneClass, // test 1
     shortTestSimClockClass, // test 2
     longTestSimClockClass, // test 3
-    test, // test 4
-    test  // test 5
+    shortTestChargerQueue, // test 4
+    longTestChargerQueue  // test 5
 };
 
 bool runTest(int selector, MenuGroup &thisMenuGroup) {
@@ -76,8 +86,8 @@ vector<MenuItem> testMenus {
     MenuItem('1', string{"Test Plane Class"}, &runTest, 1),
     MenuItem('2', string{"Short Test Sim Clock"}, &runTest, 2),
     MenuItem('3', string{"Long Test Sim Clock"}, &runTest, 3),
-    MenuItem('4', string{"Run Test 4"}, &runTest, 4),
-    MenuItem('5', string{"Run Test 5"}, &runTest, 5),
+    MenuItem('4', string{"Short Test ChargerQueue"}, &runTest, 4),
+    MenuItem('5', string{"Long Test ChargerQueue"}, &runTest, 5),
     MenuItem('A', string{"Run All Tests"}, &runAllTests, 0),
     MenuItem('M', string{"Return to Main Menu"}, &doMainMenu, 0)
 };

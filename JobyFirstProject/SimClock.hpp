@@ -15,7 +15,6 @@
 class EventHandler {
 protected:
     long nextEventTime;
-    long eventCategory; // for expansion, not currently used
 public:
     EventHandler();
     EventHandler(long nextEventTime);

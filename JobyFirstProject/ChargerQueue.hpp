@@ -17,6 +17,10 @@ struct Charger {
     std::shared_ptr<Plane> thePlane;
 };
 
+struct ChargerQueueStatusItem { // for testing
+    bool onCharger;
+    int planeNum;
+};
 class ChargerQueue: public EventHandler {
     Simulation *theSimulation;
     long chargerCount;
@@ -31,7 +35,10 @@ public:
     void addPlane(long currentTime, std::shared_ptr<Plane> aPlane);
     void describeQueues(long currentTime);
     bool isEmpty();
+    std::vector<ChargerQueueStatusItem> getQueueStatus();
 };
 
+bool testChargerQueueLong();
+bool testChargerQueueShort();
 
 #endif /* ChargerQueue_hpp */

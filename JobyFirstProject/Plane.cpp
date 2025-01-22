@@ -129,7 +129,6 @@ std::shared_ptr<Plane> Plane::getRandomPlane() {
     return std::make_shared<Plane>(specifications[0]);
 }
 
-
 const double allowedPercentDiffFromMTBF{3.0};
 
 bool testPlane(bool verbose) {

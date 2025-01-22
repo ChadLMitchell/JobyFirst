@@ -34,6 +34,11 @@ bool ChargerQueue::handleEvent(long currentTime) {
         addPlane(currentTime, planesWaiting.front());
         planesWaiting.pop();
     }
+    if(chargers.empty()) {
+        nextEventTime = LONG_MAX;
+    } else  {
+        nextEventTime = chargers.back().timeDone;
+    }
     return true;
 }
 void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
@@ -49,7 +54,7 @@ void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
             chargerPtr++;
         }
         chargers.insert(chargerPtr, Charger(timeToCharged, aPlane));
-        
+        nextEventTime = chargers.back().timeDone; // adjust the next time for our queue
         
         // if our earliest charger done time has changed, we need to be resorted
         if(nextEventTime != chargers.back().timeDone) {
@@ -63,51 +68,67 @@ void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
 void ChargerQueue::describeQueues(long currentTime) {
     std::cout << "*** ChargerQueue Status" << std::endl;
     std::cout << "Current Time: " << currentTime << std::endl;
-    std::cout << "Planes on Chargers" << std::endl;
-    for(auto aCharger: chargers) {
-        std::cout << "    " << aCharger.thePlane->describe() << " done at " << aCharger.timeDone << std::endl;
+    if(chargers.size() == 0) {
+        std::cout << "No planes planes on a charger" << std::endl;
+   } else {
+        std::cout << "Planes on Chargers" << std::endl;
+        for(auto aCharger: chargers) {
+            std::cout << "    " << aCharger.thePlane->describe() << " done at " << aCharger.timeDone << std::endl;
+        }
     }
-    std::cout << "Planes waiting for a Charger" << std::endl;
+    if(planesWaiting.empty()) {
+        std::cout << "No planes waiting for a Charger" << std::endl;
+   } else {
+        std::cout << "Planes waiting for a Charger" << std::endl;
+        // To view a queue we must pull everything off of it (and then put it all back)
+        std::vector<std::shared_ptr<Plane>> tempPlanes{};
+        // pull planes off planesWaiting, describe them and save them in tempPlanes
+        while(!planesWaiting.empty()) {
+            std::shared_ptr<Plane> aPlane = planesWaiting.front();
+            planesWaiting.pop();
+            std::cout << "    " << aPlane->describe() << std::endl;
+            tempPlanes.push_back(aPlane);
+        }
+        // restore planes to tempQueue
+        for(auto planeToRestore: tempPlanes) {
+            planesWaiting.push(planeToRestore);
+        }
+    }
+    std::cout << std::endl;
+}
+bool ChargerQueue::isEmpty() {
+    return planesWaiting.empty() && chargers.empty();
+}
+std::vector<ChargerQueueStatusItem> ChargerQueue::getQueueStatus() {
+    std::vector<ChargerQueueStatusItem> result{};
+    for(auto aCharger: chargers) {
+        result.push_back(ChargerQueueStatusItem(true,aCharger.thePlane->getPlaneNumber()));
+    }
+
     // To view a queue we must pull everything off of it (and then put it all back)
     std::vector<std::shared_ptr<Plane>> tempPlanes{};
     // pull planes off planesWaiting, describe them and save them in tempPlanes
     while(!planesWaiting.empty()) {
         std::shared_ptr<Plane> aPlane = planesWaiting.front();
         planesWaiting.pop();
-        std::cout << "    " << aPlane->describe() << std::endl;
+        result.push_back(ChargerQueueStatusItem(false,aPlane->getPlaneNumber()));
         tempPlanes.push_back(aPlane);
     }
     // restore planes to tempQueue
     for(auto planeToRestore: tempPlanes) {
         planesWaiting.push(planeToRestore);
     }
-
-    // This code is to make sure we restored the planes correctly
-    std::cout << "Repeat planes waiting for a Charger" << std::endl;
-    // pull planes off planesWaiting, describe them and save them in tempPlanes
-    while(!planesWaiting.empty()) {
-        std::shared_ptr<Plane> aPlane = planesWaiting.front();
-        planesWaiting.pop();
-        std::cout << "    " << aPlane->describe() << std::endl;
-        tempPlanes.push_back(aPlane);
-    }
-    // restore planes to tempQueue
-    for(auto planeToRestore: tempPlanes) {
-        planesWaiting.push(planeToRestore);
-    }
-}
-bool ChargerQueue::isEmpty() {
-    return planesWaiting.empty() && chargers.empty();
+    return result;
 }
 
 const int testChargers{3};
 const int testPlanes{5};
 
-bool testChargerQueue(bool verbose) {
+bool testChargerQueueLong() {
     bool returnValue = true;
     long currentTime = 0;
     ChargerQueue aQueue(nullptr, testChargers);
-    std::cout << "Starting test of ChargerQueue" << std::endl;
+    std::cout << "Starting long test of ChargerQueue" << std::endl;
     for(auto i=0; i<testPlanes; i++){
         std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
         std::cout << "Adding " << aPlane->describe() << std::endl;
@@ -120,6 +141,32 @@ bool testChargerQueue(bool verbose) {
         std::cout << "After handling event at time " << currentTime << std::endl;
         aQueue.handleEvent(currentTime);
         aQueue.describeQueues(currentTime);
+    }
+    
+    return returnValue;
+}
+bool testChargerQueueShort() {
+    bool returnValue = true;
+    long currentTime = 0;
+    ChargerQueue aQueue(nullptr, testChargers);
+    std::cout << "Starting short test of ChargerQueue" << std::endl;
+    for(auto i=0; i<testPlanes; i++){
+        std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
+        aQueue.addPlane(currentTime, aPlane);
+    }
+
+    std::vector<ChargerQueueStatusItem> queueStatus = aQueue.getQueueStatus();
+    bool doingOnChargers = true;
+    std::cout << "Planes on chargers:" << std::endl;
+    for(auto statusItem: queueStatus) {
+        // TO DO Instead of printing, we could feed in a specific set of planes and then confirm that the results are as expected.
+        // That would be more of an automated test like some of the others. We could also do some time jumps and confirm those results.
+        if(doingOnChargers && !statusItem.onCharger) {
+            std::cout << "Planes waiting for chargers:" << std::endl;
+            doingOnChargers = false;
+        }
+        std::cout << "    Plane #" << statusItem.planeNum << std::endl;
+
     }
     
     return returnValue;
