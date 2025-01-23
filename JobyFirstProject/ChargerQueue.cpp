@@ -8,6 +8,7 @@
 #include "ChargerQueue.hpp"
 #include "Plane.hpp"
 #include "Flight.hpp"
+#include "Passenger.hpp"
 
 ChargerQueue::ChargerQueue(Simulation *theSimulation, long chargerCount):
 EventHandler(LONG_MAX), theSimulation{theSimulation}, chargerCount{chargerCount}, verboseTesting{false},chargers{}, planesWaiting{} {
@@ -24,9 +25,9 @@ bool ChargerQueue::handleEvent(long currentTime) {
         std::shared_ptr<Plane> thePlane = chargers.back().thePlane;
         chargers.pop_back();
         if(theSimulation && theSimulation->theSimClock) {
-            theSimulation->theSimClock->addHandler(std::make_shared<Flight>(theSimulation, currentTime + thePlane->calcTimeOnFullCharge__seconds(), thePlane->calcPassengerCount(),thePlane));
+            theSimulation->theSimClock->addHandler(std::make_shared<Flight>(theSimulation, currentTime + thePlane->calcTimeOnFullCharge__seconds(), Passenger::getPassengerCount(thePlane->getMaxPassengerCount(), theSimulation->theSettings),thePlane));
         } else if(verboseTesting) {
-            std::cout << "Would add flight for " << thePlane->describe() << "to SimClock" << std::endl;
+            std::cout << "Would add flight for " << thePlane->describe() << "to SimClock if Sim full simulation" << std::endl;
         }
     }
     // move planes from waiting queue to charger vector
@@ -41,6 +42,12 @@ bool ChargerQueue::handleEvent(long currentTime) {
     }
     return true;
 }
+long ChargerQueue::countPlanes() {
+    return chargers.size() + planesWaiting.size();
+}
+bool ChargerQueue::isEmpty() {
+    return planesWaiting.empty() && chargers.empty();
+}
 void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
     if(chargers.size() >= chargerCount) {
         planesWaiting.push(aPlane);
@@ -54,22 +61,24 @@ void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
             chargerPtr++;
         }
         chargers.insert(chargerPtr, Charger(timeToCharged, aPlane));
-        nextEventTime = chargers.back().timeDone; // adjust the next time for our queue
         
-        // if our earliest charger done time has changed, we need to be resorted
+        // if our earliest charger done time has changed, we need to be resorted in the SimClock
         if(nextEventTime != chargers.back().timeDone) {
+            nextEventTime = chargers.back().timeDone; // adjust the next time for our queue
             if(theSimulation && theSimulation->theSimClock && theSimulation->theChargerQueue) {
-                nextEventTime = chargers.back().timeDone;
                 theSimulation->theSimClock->reSortHandler(theSimulation->theChargerQueue);
             }
         }
     }
 }
+void ChargerQueue::setVerboseTesting(bool newValue) {
+    verboseTesting = newValue;
+}
 void ChargerQueue::describeQueues(long currentTime) {
     std::cout << "*** ChargerQueue Status" << std::endl;
     std::cout << "Current Time: " << currentTime << std::endl;
     if(chargers.size() == 0) {
-        std::cout << "No planes planes on a charger" << std::endl;
+        std::cout << "No planes on a charger" << std::endl;
    } else {
         std::cout << "Planes on Chargers" << std::endl;
         for(auto aCharger: chargers) {
@@ -96,9 +105,6 @@ void ChargerQueue::describeQueues(long currentTime) {
     }
     std::cout << std::endl;
 }
-bool ChargerQueue::isEmpty() {
-    return planesWaiting.empty() && chargers.empty();
-}
 std::vector<ChargerQueueStatusItem> ChargerQueue::getQueueStatus() {
     std::vector<ChargerQueueStatusItem> result{};
     for(auto aCharger: chargers) {
@@ -121,10 +127,10 @@ std::vector<ChargerQueueStatusItem> ChargerQueue::getQueueStatus() {
     return result;
 }
 
-const int testChargers{3};
-const int testPlanes{5};
-
 bool testChargerQueueLong() {
+    const int testChargers{3};
+    const int testPlanes{5};
+
     bool returnValue = true;
     long currentTime = 0;
     ChargerQueue aQueue(nullptr, testChargers);
@@ -146,9 +152,13 @@ bool testChargerQueueLong() {
     return returnValue;
 }
 bool testChargerQueueShort() {
+    const int testChargers{3};
+    const int testPlanes{5};
+
     bool returnValue = true;
     long currentTime = 0;
     ChargerQueue aQueue(nullptr, testChargers);
+    aQueue.setVerboseTesting(true);
     std::cout << "Starting short test of ChargerQueue" << std::endl;
     for(auto i=0; i<testPlanes; i++){
         std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();

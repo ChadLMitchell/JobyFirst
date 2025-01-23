@@ -12,12 +12,13 @@
 #include "Plane.hpp"
 #include "SimClock.hpp"
 #include "ChargerQueue.hpp"
+#include "PlaneQueue.hpp"
 using namespace std;
 
 using TestFuncPtr = bool (*)(int selector);
 
 bool testPlaneClass(int selector) {
-    if(testPlane(true)) {
+    if(testPlaneClassObjects(true)) {
         cout << "Test of Plane Class passed" << endl;
     } else {
         cout << "Test of Plane Class failed" << endl;
@@ -50,6 +51,14 @@ bool longTestChargerQueue(int selector) {
     testChargerQueueLong();
     return false;
 }
+bool shortTestPlaneQueue(int selector) {
+    testPlaneQueueShort();
+    return false;
+}
+bool longTestPlaneQueue(int selector) {
+    testPlaneQueueLong();
+    return false;
+}
 
 bool test(int selector) {
     string message = "===> ran test " + to_string(selector);
@@ -62,7 +71,9 @@ vector<TestFuncPtr> tests {
     shortTestSimClockClass, // test 2
     longTestSimClockClass, // test 3
     shortTestChargerQueue, // test 4
-    longTestChargerQueue  // test 5
+    longTestPlaneQueue,  // test 5
+    shortTestPlaneQueue, // test 6
+    longTestChargerQueue  // test 7
 };
 
 bool runTest(int selector, MenuGroup &thisMenuGroup) {
@@ -88,6 +99,8 @@ vector<MenuItem> testMenus {
     MenuItem('3', string{"Long Test Sim Clock"}, &runTest, 3),
     MenuItem('4', string{"Short Test ChargerQueue"}, &runTest, 4),
     MenuItem('5', string{"Long Test ChargerQueue"}, &runTest, 5),
+    MenuItem('6', string{"Short Test PlaneQueue"}, &runTest, 6),
+    MenuItem('7', string{"Long Test PlaneQueue"}, &runTest, 7),
     MenuItem('A', string{"Run All Tests"}, &runAllTests, 0),
     MenuItem('M', string{"Return to Main Menu"}, &doMainMenu, 0)
 };

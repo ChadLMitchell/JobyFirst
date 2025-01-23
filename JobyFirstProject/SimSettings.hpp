@@ -10,14 +10,19 @@
 
 #include <stdio.h>
 
-extern int passengerCountOption;
-// 0 = plane always flies full
-// 1 = randomly distribute number of passengers between 1 and max for each flight
+struct SimSettings {
+    
+    int passengerCountOption = 0;
+    // 0 = plane always flies full
+    // 1 = randomly distribute number of passengers between 1 and max for each flight
 
-extern int faultOption;
-// 0 = just count faults
-// 1 = fault grounds plan for duration
+    int faultOption = 0;
+    // 0 = just count faults
+    // 1 = fault grounds plan for duration
 
-extern long simulationDuration;
+    long simulationDuration = 60*60*3; // default 3 hours
+    
+    long chargerCount = 3;
+};
 
 #endif /* SimSettings_hpp */

@@ -22,8 +22,9 @@ class Flight: public EventHandler {
     Simulation *theSimulation;
 public:
     Flight(Simulation *theSimulation, long startTime, long passengerCount, std::shared_ptr<Plane> aPlane);
-    virtual ~Flight();
-    virtual bool handleEvent(long currentTime);
+    virtual ~Flight() override;
+    virtual bool handleEvent(long currentTime) override;
+    virtual long countPlanes() override;
     void recordFlight();
 };
 

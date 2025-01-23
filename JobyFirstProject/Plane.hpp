@@ -24,7 +24,7 @@ extern const char *companyNames[];
 const char *companyName(Company c);
 
 // Specifications provided by the task
-struct Specification {
+struct PlaneSpecification {
     Company theCompany;
     double cruise_speed__mph;
     double battery_capacity__kWh;
@@ -35,13 +35,13 @@ struct Specification {
 };
 
 class Plane {
-    Specification mySpecs;
+    PlaneSpecification mySpecs;
     
     long nextFaultInterval; // seconds
     static int NextPlaneNumber;
     int planeNumber;
 public:
-    Plane(Specification &spec);
+    Plane(PlaneSpecification &spec);
     ~Plane();
     Company getCompany();
     const char *getCompanyName();
@@ -51,16 +51,17 @@ public:
     double calcDistanceFullCharge__miles(); // calculated value
     long calcTimeOnFullCharge__seconds(); // calculated value
     double calcMeanTimeBetweenFaults(); // calculated value
-    long calcPassengerCount();
+    long getMaxPassengerCount();
     
     long getNextFaultInterval();
     long decrementNextFaultLinterval(long seconds);
     long createFaultInterval();
-    
+
+    static bool validateSpecs(PlaneSpecification &spec);
+
     static std::shared_ptr<Plane> getRandomPlane();
 };
 
-bool validateSpecs(Specification &spec);
-bool testPlane(bool verbose = true);
+bool testPlaneClassObjects(bool verbose = true);
 
 #endif /* Plane_hpp */

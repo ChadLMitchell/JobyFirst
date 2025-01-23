@@ -27,14 +27,15 @@ class ChargerQueue: public EventHandler {
     bool verboseTesting;
     std::vector<Charger> chargers;
     std::queue<std::shared_ptr<Plane>> planesWaiting;
-        // TO DO: consider using a list for performance later
 public:
     ChargerQueue(Simulation *theSimulation, long chargerCount);
-    virtual ~ChargerQueue();
-    virtual bool handleEvent(long currentTime);
-    void addPlane(long currentTime, std::shared_ptr<Plane> aPlane);
-    void describeQueues(long currentTime);
+    virtual ~ChargerQueue() override;
+    virtual bool handleEvent(long currentTime) override;
+    virtual long countPlanes() override;
     bool isEmpty();
+    void addPlane(long currentTime, std::shared_ptr<Plane> aPlane);
+    void setVerboseTesting(bool newValue);
+    void describeQueues(long currentTime);
     std::vector<ChargerQueueStatusItem> getQueueStatus();
 };
 

@@ -7,6 +7,7 @@
 
 #include <random>
 #include "Plane.hpp"
+#include "Passenger.hpp"
 
 const char *companyNames[]{
     "Alpha Company",
@@ -23,7 +24,7 @@ const char *companyName(Company c) {
     return companyNames[c];
 }
 
-Specification specifications[]{
+PlaneSpecification planeSpecifications[]{
 //    Company theCompany;
 //    double cruise_speed__mph;
 //    double battery_capacity__kWh;
@@ -31,48 +32,19 @@ Specification specifications[]{
 //    double energy_use__kWh_per_mile;
 //    long passenger_count;
 //    double probability_fault__per_hour;
-    Specification(Company::Alpha, 120, 320, 0.6, 1.6, 4, 0.25),
-    Specification(Company::Bravo, 100, 100, 0.2, 1.5, 5, 0.1),
-    Specification(Company::Charlie, 160, 220, 0.8, 2.2, 3, 0.05),
-    Specification(Company::Delta, 90, 120, 0.62, 0.8, 2, 0.22),
-    Specification(Company::Echo, 30, 150, 0.3, 5.8, 2, 0.61)
+    PlaneSpecification(Company::Alpha, 120, 320, 0.6, 1.6, 4, 0.25),
+    PlaneSpecification(Company::Bravo, 100, 100, 0.2, 1.5, 5, 0.1),
+    PlaneSpecification(Company::Charlie, 160, 220, 0.8, 2.2, 3, 0.05),
+    PlaneSpecification(Company::Delta, 90, 120, 0.62, 0.8, 2, 0.22),
+    PlaneSpecification(Company::Echo, 30, 150, 0.3, 5.8, 2, 0.61)
 };
 
-bool validateSpecs(Specification &spec) {
-    bool returnValue{true};
-    if(spec.cruise_speed__mph <= 0) {
-        returnValue = false;
-        // log error
-    }
-    if(spec.battery_capacity__kWh <= 0) {
-        returnValue = false;
-        // log error
-    }
-    if(spec.time_to_charge__hours <= 0) {
-        returnValue = false;
-        // log error
-    }
-    if(spec.energy_use__kWh_per_mile <= 0) {
-        returnValue = false;
-        // log error
-    }
-    if(spec.passenger_count <= 0) {
-        returnValue = false;
-        // log error
-    }
-    if(spec.energy_use__kWh_per_mile <= 0) {
-        returnValue = false;
-        // log error
-    }
-    return returnValue;
-}
-
 int Plane::NextPlaneNumber = 1;
-Plane::Plane(Specification &spec): mySpecs(spec) {
+Plane::Plane(PlaneSpecification &spec): mySpecs(spec) {
     // Avoid divide by 0 and other silly errors
     // We should validate specs before creating Plane, this is extra checking
     if(!validateSpecs(mySpecs)) {
-        throw std::runtime_error("Attempt to create plane with invalid specifications");
+        throw std::runtime_error("Attempt to create plane with invalid PlaneSpecifications");
     }
     planeNumber = NextPlaneNumber++;
     createFaultInterval();
@@ -121,25 +93,52 @@ long Plane::createFaultInterval() {
     nextFaultInterval = -std::log(random0to1) * 360 / mySpecs.probability_fault__per_hour;
     return nextFaultInterval;
 }
-long Plane::calcPassengerCount() {
+long Plane::getMaxPassengerCount() {
     return mySpecs.passenger_count;
-    // NEED TO RESPOND TO SETTINGS TO DO *******************************************
+}
+bool Plane::validateSpecs(PlaneSpecification &spec) {
+    bool returnValue{true};
+    if(spec.cruise_speed__mph <= 0) {
+        returnValue = false;
+        // log error
+    }
+    if(spec.battery_capacity__kWh <= 0) {
+        returnValue = false;
+        // log error
+    }
+    if(spec.time_to_charge__hours <= 0) {
+        returnValue = false;
+        // log error
+    }
+    if(spec.energy_use__kWh_per_mile <= 0) {
+        returnValue = false;
+        // log error
+    }
+    if(spec.passenger_count <= 0) {
+        returnValue = false;
+        // log error
+    }
+    if(spec.energy_use__kWh_per_mile <= 0) {
+        returnValue = false;
+        // log error
+    }
+    return returnValue;
 }
 std::shared_ptr<Plane> Plane::getRandomPlane() {
-    return std::make_shared<Plane>(specifications[0]);
+    return std::make_shared<Plane>(planeSpecifications[0]);
 }
 
 const double allowedPercentDiffFromMTBF{3.0};
 
-bool testPlane(bool verbose) {
+bool testPlaneClassObjects(bool verbose) {
     bool returnValue = true;
     const double tries = 10000;
     if(verbose) {
         std::cout << "Testing Plane Class" << std::endl;
         std::cout << "Validating specificastions and simulation of time to next fault" << std::endl;
     }
-    for(Specification aSpec: specifications) {
-        if(!validateSpecs(aSpec)) {
+    for(PlaneSpecification aSpec: planeSpecifications) {
+        if(!Plane::validateSpecs(aSpec)) {
             if(verbose) {
                 std::cout << companyName(aSpec.theCompany) << " has invalid specification" << std::endl;
             }

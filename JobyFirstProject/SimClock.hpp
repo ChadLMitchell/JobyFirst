@@ -22,6 +22,7 @@ public:
     long getNextEventTime();
     void setNextEventTime(long aTime);
     virtual bool handleEvent(long currentTime);
+    virtual long countPlanes();
 };
 class SimClock {
     Simulation *theSimulation;
@@ -39,6 +40,7 @@ public:
     void reSortHandler(std::shared_ptr<EventHandler> aHandler);
     void markNeedSort();
     bool run();
+    long countPlanes();
 };
 
 bool testSimClock(long howLongSeconds);

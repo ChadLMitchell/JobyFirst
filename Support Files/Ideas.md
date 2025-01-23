@@ -1,5 +1,16 @@
 #  Ideas for Joby First Project
 
+Key TO DOs
+Catch throws
+test plane count
+
+
+
+
+
+
+
+
 This is to capture observations and ideas as they occur.
 
 Jan 17

@@ -24,6 +24,9 @@ void EventHandler::setNextEventTime(long aTime) {
 bool EventHandler::handleEvent(long currentTime) {
     return false;
 }
+long EventHandler::countPlanes() {
+    return 0;
+}
 
 SimClock::SimClock(Simulation *theSimulation, long endTime):
         theSimulation{theSimulation}, endTime{endTime}, currentTime{0}, needSort{false} {
@@ -99,6 +102,14 @@ bool SimClock::run() {
     }
     return true;
 }
+long SimClock::countPlanes() {
+    long returnValue = 0;
+    for(auto aHandler: eventHandlers) {
+        returnValue += aHandler->countPlanes();
+    }
+    return returnValue;
+}
+
 
 const int maxRangeDelay{20};
 const int maxTestHandlerRepeat{20};
@@ -110,7 +121,6 @@ std::uniform_int_distribution<> distribTestHandlerDelay(1, maxRangeDelay);
 std::uniform_int_distribution<> distribTestHandlerRepeat(1, maxTestHandlerRepeat);
 
 class TestHandler: public EventHandler {
-    static long errorCount;
     long repeats; // how many times does this run?
     long handlerID;
 public:
@@ -132,17 +142,11 @@ public:
         nextEventTime = currentTime + distribTestHandlerDelay(genTestHandler);
         return true;
     }
-    long getErrorCount() {
-        return errorCount;
-    }
 };
-long TestHandler::errorCount = 0;
 
 bool testSimClock(long howLongSeconds) {
     std::cout << "Test Sim Clock" << std::endl;
     SimClock aClock(nullptr, howLongSeconds);
-//    SimClock aClock(howLongSeconds);
-
     for(int i=0; i<testHandlerCount; i++) {
         aClock.addHandler(std::make_shared<TestHandler>(distribTestHandlerDelay(genTestHandler), distribTestHandlerRepeat(genTestHandler),i + 1));
     }
