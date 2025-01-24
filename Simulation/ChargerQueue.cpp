@@ -25,7 +25,7 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
                 // log this charge
                 ChargerStats someStats{aCharger.thePlane->getCompany(),
                     aCharger.thePlane->getPlaneNumber(),
-                    currentTime - aCharger.timeStarted};
+                    currentTime - aCharger.timeStarted, currentTime - aCharger.timeStartedIncludingWait};
                 theSimulation->theChargerStats.push_back(someStats);
             }
         }
@@ -43,7 +43,7 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
             Charger aCharger = chargers.back();
             ChargerStats someStats{aCharger.thePlane->getCompany(),
                 aCharger.thePlane->getPlaneNumber(),
-                currentTime - aCharger.timeStarted};
+                currentTime - aCharger.timeStarted, currentTime - aCharger.timeStartedIncludingWait};
             theSimulation->theChargerStats.push_back(someStats);
         }
 
@@ -56,8 +56,9 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
     }
     // move planes from waiting queue to charger vector
     while(!planesWaiting.empty() && chargers.size() < chargerCount) {
-        addPlane(currentTime, planesWaiting.front());
+        WaitingPlane aWaitingPlane = planesWaiting.front();
         planesWaiting.pop();
+        addCharger(currentTime, aWaitingPlane.timeStarted, aWaitingPlane.thePlane);
     }
     if(chargers.empty()) {
         nextEventTime = LONG_MAX;
@@ -78,7 +79,16 @@ bool ChargerQueue::isEmpty() {
 }
 void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
     if(chargers.size() >= chargerCount) {
-        planesWaiting.push(aPlane);
+        WaitingPlane aWaitingPlane = WaitingPlane{currentTime, aPlane};
+        planesWaiting.push(aWaitingPlane);
+    } else {
+        addCharger(currentTime, currentTime, aPlane);
+    }
+}
+void ChargerQueue::addCharger(long currentTime, long startedWaiting, std::shared_ptr<Plane> aPlane) {
+    if(chargers.size() >= chargerCount) {
+        std::cout <<"error: trying to add too many chargers " << std::endl;
+        return;
     } else {
         // Keep chargers sorted with soonest time at the end.
         // Insert the new charger into the first location that will keep it sorted.
@@ -88,7 +98,7 @@ void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
         while(chargerPtr != end(chargers) &&  chargerPtr->timeDone > timeToCharged) {
             chargerPtr++;
         }
-        Charger aCharger = Charger(currentTime, timeToCharged, aPlane);
+        Charger aCharger = Charger{currentTime, startedWaiting, timeToCharged, aPlane};
         chargers.insert(chargerPtr, aCharger);
         
         // if our earliest charger done time has changed, we need to be resorted in the SimClock
@@ -119,13 +129,14 @@ void ChargerQueue::describeQueues(long currentTime) {
    } else {
         std::cout << "Planes waiting for a Charger" << std::endl;
         // To view a queue we must pull everything off of it (and then put it all back)
-        std::vector<std::shared_ptr<Plane>> tempPlanes{};
+        std::vector<WaitingPlane> tempPlanes{};
         // pull planes off planesWaiting, describe them and save them in tempPlanes
         while(!planesWaiting.empty()) {
-            std::shared_ptr<Plane> aPlane = planesWaiting.front();
+            WaitingPlane aWaitingPlane = planesWaiting.front();
             planesWaiting.pop();
-            std::cout << "    " << aPlane->describe() << std::endl;
-            tempPlanes.push_back(aPlane);
+            std::cout << "    " << "Waiting " << currentTime - aWaitingPlane.timeStarted
+            << " seconds: " << aWaitingPlane.thePlane->describe() << std::endl;
+            tempPlanes.push_back(aWaitingPlane);
         }
         // restore planes to tempQueue
         for(auto planeToRestore: tempPlanes) {
@@ -142,14 +153,14 @@ std::vector<ChargerQueueStatusItem> ChargerQueue::getQueueStatus() {
     }
 
     // To view a queue we must pull everything off of it (and then put it all back)
-    std::vector<std::shared_ptr<Plane>> tempPlanes{};
+    std::vector<WaitingPlane> tempPlanes{};
     // pull planes off planesWaiting, describe them and save them in tempPlanes
     while(!planesWaiting.empty()) {
-        std::shared_ptr<Plane> aPlane = planesWaiting.front();
+        WaitingPlane aWaitingPlane = planesWaiting.front();
         planesWaiting.pop();
-        ChargerQueueStatusItem anItem{false,aPlane->getPlaneNumber()};
+        ChargerQueueStatusItem anItem{false,aWaitingPlane.thePlane->getPlaneNumber()};
         result.push_back(anItem);
-        tempPlanes.push_back(aPlane);
+        tempPlanes.push_back(aWaitingPlane);
     }
     // restore planes to tempQueue
     for(auto planeToRestore: tempPlanes) {

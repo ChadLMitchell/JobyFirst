@@ -38,6 +38,7 @@ void outputResults(std::vector<FinalStats> results)
     //      double averageDistancePerFlight;
     //      long totalCharges;
     //      double averageTimeCharging;
+    //      double averageTimeChargingWithWait;
     //      long totalFaults;
     //      long totalPassengerMiles;
     // };
@@ -49,6 +50,7 @@ void outputResults(std::vector<FinalStats> results)
     << left << setw(14) << "Avgerage "
     << left << setw(9) << "Total  "
     << left << setw(13) << "Avgerage "
+    << left << setw(17) << "Average Charge "
     << left << setw(8) << "Total "
     << left << setw(15) << "Total"
     << endl;
@@ -58,6 +60,7 @@ void outputResults(std::vector<FinalStats> results)
     << left << setw(14) << "Miles/Flight "
     << left << setw(9) << "Charges "
     << left << setw(13) << "Time/Charge "
+    << left << setw(17) << "Time incl. Wait "
     << left << setw(8) << "Faults "
     << left << setw(15) << "Passenger Miles"
     << endl;
@@ -69,6 +72,7 @@ void outputResults(std::vector<FinalStats> results)
         << left << setw(14) << r.averageDistancePerFlight
         << left << setw(9) << r.totalCharges
         << left << setw(13) << r.averageTimeCharging
+        << left << setw(17) << r.averageTimeChargingWithWait
         << left << setw(8) << r.totalFaults
         << left << setw(15) << r.totalPassengerMiles
         << endl;
@@ -88,8 +92,9 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
         runSettings.simulationDuration = longTestClockSeconds * 100; // 3000 hours
     } else if(selector == 5) {
         runSettings.simulationDuration = longTestClockSeconds * 1000; // 30,000 hours
-    } else if(selector == 6) {
-        runSettings.simulationDuration = longTestClockSeconds * 10000; // 300,000 hours
+// This option works on Mac, but it would require all times to be long long on Windows
+//    } else if(selector == 6) {
+//        runSettings.simulationDuration = longTestClockSeconds * 10000; // 300,000 hours
     }
 
     Simulation aSimulation(runSettings);
@@ -174,8 +179,9 @@ vector<MenuItem> mainMenus {
     MenuItem('3', string{"Run 300-hour (12.5 Day) Simulation"}, &runSimulation, 3),
     MenuItem('4', string{"Run 3000-hour (125 Day) Simulation"}, &runSimulation, 4),
     MenuItem('5', string{"Run 30,000-hour (1250 Day) Simulation"}, &runSimulation, 5),
-    MenuItem('6', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
-    MenuItem('7', string{"Average results from 100 Default Simulations"}, &runMultiple, 0),
+// This option works on Mac, but it would require all times to be long long on Windows
+//    MenuItem('6', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
+    MenuItem('M', string{"Average results from 100 Default Simulations"}, &runMultiple, 0),
     MenuItem('Q', string{"Quit"}, &doQuit, 0)
 };
 MenuGroup mainMenu = MenuGroup(mainMenus);

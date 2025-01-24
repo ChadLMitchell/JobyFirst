@@ -20,12 +20,24 @@
  * Struct Charger
  * This is used to store information about active chargers.
  * In addition to the plane, we need the time charging is done.
- * And for statistics, we also need when it started so we can caluclate duration..
+ * And for statistics, we also need when it started so we can caluclate duration.
  *******************************************************************************************
  */
 struct Charger {
     long timeStarted;
+    long timeStartedIncludingWait;
     long timeDone;
+    std::shared_ptr<Plane> thePlane;
+};
+/*
+ *******************************************************************************************
+ * Struct WaitingPlane
+ * This is used to store information about planes waiting for chargers.
+ * We need this information to calculate how long it waited.
+ *******************************************************************************************
+ */
+struct WaitingPlane {
+    long timeStarted;
     std::shared_ptr<Plane> thePlane;
 };
 
@@ -58,7 +70,7 @@ class ChargerQueue: public EventHandler {
     long chargerCount; // How many chargers in this simulation
     bool verboseTesting; // For testing, provides more details to cout
     std::vector<Charger> chargers; // Zero or more chargers (<= chargerCount)
-    std::queue<std::shared_ptr<Plane>> planesWaiting; // Planes waiting for a charger
+    std::queue<WaitingPlane> planesWaiting; // Planes waiting for a charger
 public:
     ChargerQueue(Simulation *theSimulation, long chargerCount);
     virtual ~ChargerQueue() override;
@@ -87,7 +99,10 @@ public:
     // the plane back into the planeQueue until it can be put into a flight.
     void addPlane(long currentTime, std::shared_ptr<Plane> aPlane);
     
-    // Set private variable for testing
+    // Add a plane to the charger. Should only be called if there are available chargers
+    // Captures the time the plane has already started waited in the queue (if any).
+    void addCharger(long currentTime, long startedWaiting, std::shared_ptr<Plane> aPlane);
+
     void setVerboseTesting(bool newValue);
     
     // Describe the current state of the queues for testing

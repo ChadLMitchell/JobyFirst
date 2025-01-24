@@ -77,8 +77,10 @@ std::vector<FinalStats> Simulation::run(bool verbose)
         Company c{cs.theCompany};
         chargeCounts[c]++;
         totalChargerStats[c].duration += cs.duration;
+        totalChargerStats[c].durationWithWait += cs.durationWithWait;
         if(verbose) {
             cout << "Charge Duration: " << setw(10) << cs.duration
+            << "Duration+Wait: " << setw(10) << cs.durationWithWait
             << " Plane #" << left << setw(3) << cs.planeNumber
             << " " << companyName(cs.theCompany) << endl;
         }
@@ -96,6 +98,7 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     //      double averageDistancePerFlight;
     //      long totalCharges;
     //      double averageTimeCharging;
+    //      double averageTimeChargingWithWait;
     //      long totalFaults;
     //      long totalPassengerMiles;
     // };
@@ -114,7 +117,9 @@ std::vector<FinalStats> Simulation::run(bool verbose)
         double averageTime = totalFlightStats[c].duration/flightCountD;
         FinalStats stats{c,  flightCounts[c], averageTime,
             averageTime * planeSpecifications[c].cruise_speed__mph / seconds_per_hour,
-            chargeCounts[c], totalChargerStats[c].duration / chargeCountD,
+            chargeCounts[c],
+            totalChargerStats[c].duration / chargeCountD,
+            totalChargerStats[c].durationWithWait / chargeCountD,
             totalFlightStats[c].faultCount,
             totalFlightStats[c].passengerMiles};
         returnValue.push_back(stats);

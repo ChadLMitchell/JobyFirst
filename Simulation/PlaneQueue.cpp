@@ -59,7 +59,7 @@ void PlaneQueue::addPlane(long delayUntil, std::shared_ptr<Plane> aPlane) {
     while(planePtr != end(planesWaiting) &&  planePtr->nextFlightTime > delayUntil) {
         planePtr++;
     }
-    PlaneQueueItem queueItem = PlaneQueueItem(aPlane, delayUntil);
+    PlaneQueueItem queueItem = PlaneQueueItem{aPlane, delayUntil};
     planesWaiting.insert(planePtr, queueItem);
     
     // if our nextFlightTime time has changed, we need to be resorted in the SimClock

@@ -46,6 +46,7 @@ struct ChargerStats {
     Company theCompany; // Enum id of the plane's company
     int planeNumber; // Plane number to help with debugging
     long duration; // How long on the charger. If time runs out, partial time is logged.
+    long durationWithWait; // How long on the charger plus wait time. If time runs out, partial time is logged.
 };
 // These are for the final statistics returned by each simulator run.
 // There will be one row for each company/type of plane.
@@ -63,6 +64,7 @@ struct FinalStats {
     double averageDistancePerFlight; // Average distance per flight
     long totalCharges; // How many charges did planes of this type receive?
     double averageTimeCharging; // What was the average time to charge?
+    double averageTimeChargingWithWait; // What was the average time to charge including waiting time?
     long totalFaults; // How many faults were experienced by planes of this kind
     double totalPassengerMiles; // Total passenger miles (computed for each flight)
                                 // You could compute them from other fields, but only if
