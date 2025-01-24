@@ -9,6 +9,8 @@
 #define MainMenu_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include "CmdLineMenus.hpp"
 
 extern MenuGroup mainMenu;

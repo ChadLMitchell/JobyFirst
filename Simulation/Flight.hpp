@@ -9,6 +9,8 @@
 #define Flight_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include "SimClock.hpp"
 #include "Plane.hpp"
 
@@ -27,19 +29,27 @@
  *******************************************************************************************
  */
 class Flight: public EventHandler {
-    long startTime;
-    long endTime;
-    long nextFaultTime;
-    long passengerCount;
-    long faultCount;
-    std::shared_ptr<Plane> thePlane;
-    Simulation *theSimulation;
+    long startTime; // What time did this flight start?
+    long endTime; // What time should this flight complete (if not interrupted)?
+    long nextFaultTime; // When is the next fault going to happen?
+    long passengerCount; // How many passengers on this flight?
+    long faultCount; // How many faults have happened so far on this flight?
+    std::shared_ptr<Plane> thePlane; // The plane assigned to this flight
+    Simulation *theSimulation; // Simulation object containing current simulation or nullptr
 public:
     Flight(Simulation *theSimulation, long startTime, long passengerCount, std::shared_ptr<Plane> aPlane);
     virtual ~Flight() override;
+
+    // Handle events when the flight is done, the simulation is done or a fault occurs
     virtual bool handleEvent(long currentTime, bool closeOut) override;
+
+    // For testing: for this child class it always returns 1
     virtual long countPlanes() override;
+
+    // For testing: provide a description of this object
     virtual const std::string describe() override;
+    
+    // When the flight completes, record its information for simulation statistics
     void recordFlight();
 };
 

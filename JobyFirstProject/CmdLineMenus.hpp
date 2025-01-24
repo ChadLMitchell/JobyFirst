@@ -9,6 +9,8 @@
 #define CmdLineMenus_hpp
 
 #include <iostream>
+#include <vector>
+#include <string>
 
 class MenuGroup;
 

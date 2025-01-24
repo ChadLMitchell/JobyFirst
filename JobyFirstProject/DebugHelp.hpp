@@ -9,6 +9,8 @@
 #define DebugHelp_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include <iostream>
 
 #define DODEBUG 1

@@ -136,7 +136,7 @@ class TestHandler: public EventHandler {
     long repeats; // how many times does this run?
     long handlerID;
 public:
-    TestHandler(): EventHandler()  {
+    TestHandler(): EventHandler(LONG_MAX)  {
         repeats = 1;
         handlerID = 0;
     };

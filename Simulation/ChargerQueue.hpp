@@ -9,6 +9,8 @@
 #define ChargerQueue_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include "SimClock.hpp"
 #include "Plane.hpp"
 
@@ -71,7 +73,7 @@ public:
     // For testing: count how may planes are in the queue or on chargers
     virtual long countPlanes() override;
 
-    // For testing: provide a description of the plane
+    // For testing: provide a description of this object
     virtual const std::string describe() override;
 
     // Are the vector and chargers both empty?

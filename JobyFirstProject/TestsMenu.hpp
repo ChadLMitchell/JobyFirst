@@ -9,6 +9,8 @@
 #define TestsMenu_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include "CmdLineMenus.hpp"
 
 bool runTests(int selector, MenuGroup &thisMenuGroup);

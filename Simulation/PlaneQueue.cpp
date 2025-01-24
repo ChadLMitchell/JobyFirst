@@ -12,7 +12,7 @@
 extern PlaneSpecification planeSpecifications[];
 
 PlaneQueue::PlaneQueue(Simulation *theSimulation):
-theSimulation{theSimulation}, verboseTesting{}, planesWaiting{} {
+EventHandler(LONG_MAX),theSimulation{theSimulation}, verboseTesting{}, planesWaiting{} {
 }
 PlaneQueue::~PlaneQueue() {
 }
@@ -164,7 +164,8 @@ void PlaneQueue::describeQueue(long currentTime) {
 std::vector<PlaneQueueStatusItem> PlaneQueue::getQueueStatus() {
     std::vector<PlaneQueueStatusItem> result{};
     for(auto aPlaneQueueItem: planesWaiting) {
-        result.push_back(PlaneQueueStatusItem(aPlaneQueueItem.thePlane->getPlaneNumber(),aPlaneQueueItem.nextFlightTime));
+        PlaneQueueStatusItem anItem{aPlaneQueueItem.thePlane->getPlaneNumber(),aPlaneQueueItem.nextFlightTime};
+        result.push_back(anItem);
     }
     return result;
 

@@ -23,10 +23,10 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
             aCharger.timeDone = currentTime;
             if(theSimulation) {
                 // log this charge
-                theSimulation->theChargerStats.push_back(
-                    ChargerStats(aCharger.thePlane->getCompany(),
-                                 aCharger.thePlane->getPlaneNumber(),
-                                 currentTime - aCharger.timeStarted));
+                ChargerStats someStats{aCharger.thePlane->getCompany(),
+                    aCharger.thePlane->getPlaneNumber(),
+                    currentTime - aCharger.timeStarted};
+                theSimulation->theChargerStats.push_back(someStats);
             }
         }
         return false;
@@ -40,10 +40,11 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
         std::shared_ptr<Plane> thePlane = chargers.back().thePlane;
         if(theSimulation) {
             // log this charge
-            theSimulation->theChargerStats.push_back(
-                ChargerStats(chargers.back().thePlane->getCompany(),
-                             chargers.back().thePlane->getPlaneNumber(),
-                             currentTime - chargers.back().timeStarted));
+            Charger aCharger = chargers.back();
+            ChargerStats someStats{aCharger.thePlane->getCompany(),
+                aCharger.thePlane->getPlaneNumber(),
+                currentTime - aCharger.timeStarted};
+            theSimulation->theChargerStats.push_back(someStats);
         }
 
         chargers.pop_back();
@@ -135,7 +136,8 @@ void ChargerQueue::describeQueues(long currentTime) {
 std::vector<ChargerQueueStatusItem> ChargerQueue::getQueueStatus() {
     std::vector<ChargerQueueStatusItem> result{};
     for(auto aCharger: chargers) {
-        result.push_back(ChargerQueueStatusItem(true,aCharger.thePlane->getPlaneNumber()));
+        ChargerQueueStatusItem anItem{true,aCharger.thePlane->getPlaneNumber()};
+        result.push_back(anItem);
     }
 
     // To view a queue we must pull everything off of it (and then put it all back)
@@ -144,7 +146,8 @@ std::vector<ChargerQueueStatusItem> ChargerQueue::getQueueStatus() {
     while(!planesWaiting.empty()) {
         std::shared_ptr<Plane> aPlane = planesWaiting.front();
         planesWaiting.pop();
-        result.push_back(ChargerQueueStatusItem(false,aPlane->getPlaneNumber()));
+        ChargerQueueStatusItem anItem{false,aPlane->getPlaneNumber()};
+        result.push_back(anItem);
         tempPlanes.push_back(aPlane);
     }
     // restore planes to tempQueue

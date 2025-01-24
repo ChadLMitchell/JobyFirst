@@ -8,6 +8,8 @@
 #include "SettingsMenu.hpp"
 
 #include <iostream>
+#include <vector>
+#include <string>
 #include <iomanip>
 #include "DebugHelp.hpp"
 #include "CmdLineMenus.hpp"

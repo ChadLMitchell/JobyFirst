@@ -7,8 +7,6 @@
 
 #include "EventHandler.hpp"
 
-EventHandler::EventHandler():  nextEventTime{} {
-}
 EventHandler::EventHandler(long nextEventTime):  nextEventTime{nextEventTime} {
 }
 

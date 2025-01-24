@@ -9,6 +9,8 @@
 #define PlaneQueue_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include "SimClock.hpp"
 #include "Plane.hpp"
 

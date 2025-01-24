@@ -9,7 +9,8 @@
 #define SimSettings_hpp
 
 #include <stdio.h>
-
+#include <vector>
+#include <string>
 struct SimSettings {
     
     int passengerCountOption = 0;

@@ -9,6 +9,8 @@
 #define Simulation_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include <iostream>
 #include "Plane.hpp"
 #include "SimSettings.hpp"

@@ -9,6 +9,8 @@
 #define MenuGroupWithAllOption_hpp
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include <iostream>
 #include "MenuGroupWithAllOption.hpp"
 

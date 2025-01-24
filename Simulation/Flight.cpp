@@ -83,7 +83,8 @@ void Flight::recordFlight() {
     double passengerMiles = flightDuration * passengerCount * thePlane->getMilesPerHour();
     passengerMiles /= 3600.0;
     if(theSimulation) {
-        theSimulation->theFlightStats.push_back(FlightStats(thePlane->getCompany(),thePlane->getPlaneNumber(), flightDuration,passengerCount,faultCount, passengerMiles));
+        FlightStats someStats{thePlane->getCompany(),thePlane->getPlaneNumber(), flightDuration,passengerCount,faultCount, passengerMiles};
+        theSimulation->theFlightStats.push_back(someStats);
     }
 }
 

@@ -6,6 +6,8 @@
 //
 
 #include <iostream>
+#include <vector>
+#include <string>
 #include "CmdLineMenus.hpp"
 #include "MenuGroupWithAllOption.hpp"
 
