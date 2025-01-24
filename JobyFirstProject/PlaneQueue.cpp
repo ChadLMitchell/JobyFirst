@@ -9,6 +9,8 @@
 #include "Flight.hpp"
 #include "Passenger.hpp"
 
+extern PlaneSpecification planeSpecifications[];
+
 PlaneQueue::PlaneQueue(Simulation *theSimulation):
 theSimulation{theSimulation}, verboseTesting{}, planesWaiting{} {
 }
@@ -68,15 +70,64 @@ void PlaneQueue::addPlane(long delayUntil, std::shared_ptr<Plane> aPlane) {
     }
 
 }
-void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachKind) {
-// TO DO: create planes with constraints on minOfEachKind
-// TO DO: use settings to select value for delayUntil
-    // ********************************************************
+// Generate "count" planes semi-randomly. Make sure at least "minOfEachKind" are generated
+// for each kind. This algorithm can only work correctly if
+//      count >= minOfEachKind * numberOfKinds.
+void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachCompany) {
     
-    for(long i = 0; i < count; i++) {
-        addPlane(0, Plane::getRandomPlane());
+    // Set up an array of how many minimum are needed of each kind
+    long neededOfCompany[maxCompany + 1]{};
+    for(long i = 0; i <= maxCompany; i++) {
+        neededOfCompany[i] = minOfEachCompany;
     }
-
+    long totalCompanyStillNeeded{minOfEachCompany * (maxCompany + 1)};
+    
+    // Allocate planes to random Companies, with constraints
+    Company companyChoices[count];
+    for(long planesAllocated = 0; planesAllocated < count; planesAllocated++) {
+        // initally they can be totally random.
+        long thisCompany = rand() % (maxCompany + 1);
+        // Test if we reach a point where we need to be more careful about our allocations
+        if(planesAllocated >= count - totalCompanyStillNeeded) {
+            // if so, adjust the selection until we find a Company needed
+            long originalCompany = thisCompany; // save it to test for infinite loop
+            while(neededOfCompany[thisCompany] <= 0) {
+                // increase it, wrapping around
+                // Warning, if this code is not right it could create an infinite loop
+                thisCompany = (thisCompany + 1) % (maxCompany + 1);
+                if(thisCompany == originalCompany) {
+                    // We have wrapped around and not found what we needed so stop trying
+                    std::cout << "Cleared infinite loop. planesAllocated: " << planesAllocated <<
+                    " count: " << count <<
+                    " totalCompanyStillNeeded: " << totalCompanyStillNeeded << std::endl;
+                    break;
+                }
+            }
+        }
+        // Mark the Company used, if it still needs it
+        if(neededOfCompany[thisCompany] > 0) {
+            neededOfCompany[thisCompany]--;
+            totalCompanyStillNeeded--;
+        }
+        // Remember the choice
+        companyChoices[planesAllocated] = allCompany[thisCompany];
+    }
+    // Prefetch the maximum passenger delay
+    long maxDelay = 0;
+    if(theSimulation && theSimulation->theSettings && theSimulation->theSettings->maxPassengerDelay > 0) {
+        maxDelay = theSimulation->theSettings->maxPassengerDelay;
+    }
+    // We do the actual allocation of planes as a separate step in case we want to add more processing first
+    for(long choiceIndex: companyChoices) {
+        Company thisChoice = companyChoices[choiceIndex];
+        // set up this plane's wait for passengers
+        long waitForPassengers = 0;
+        if(maxDelay > 0) {
+            waitForPassengers = rand() % maxDelay;
+        }
+        // actually add the random plane
+        addPlane(waitForPassengers, std::make_shared<Plane>(planeSpecifications[thisChoice]));
+    }
 }
 std::shared_ptr<Plane> PlaneQueue::removeNextPlane() {
     if(planesWaiting.empty()) {

@@ -1,8 +1,6 @@
 #  Ideas for Joby First Project
 
 Key TO DOs
-Catch throws
-pseudo random planes
 options?
 documentation
 

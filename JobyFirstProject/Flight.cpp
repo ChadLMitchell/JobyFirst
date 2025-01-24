@@ -8,6 +8,7 @@
 #include "SimSettings.hpp"
 #include "Flight.hpp"
 #include "ChargerQueue.hpp"
+#include "PlaneQueue.hpp"
 
 Flight::Flight(Simulation *theSimulation, long startTime, long passengerCount, std::shared_ptr<Plane> aPlane):
 EventHandler(LONG_MAX),theSimulation{theSimulation}, startTime{startTime}, endTime{startTime+aPlane->calcTimeOnFullCharge__seconds()}, nextFaultTime{startTime+aPlane->getNextFaultInterval()}, passengerCount{passengerCount},thePlane{aPlane} {
@@ -17,28 +18,31 @@ EventHandler(LONG_MAX),theSimulation{theSimulation}, startTime{startTime}, endTi
 Flight::~Flight() {
 }
 bool Flight::handleEvent(long currentTime, bool closeOut) {
+    // get the option for how we handle faults
+    // we do it here since we need it several times below
+    int faultOption = 0;
+    if(theSimulation && theSimulation->theSettings) {
+        faultOption = theSimulation->theSettings->faultOption;
+    }
     if(currentTime == nextFaultTime) {
         // We hit a fault interval so handle the fault
         faultCount++;
         // get a new next fault time
         nextFaultTime = currentTime + thePlane->createFaultInterval();
-        // get the option for how we handle faults
-        int faultOption = 0;
-        if(theSimulation && theSimulation->theSettings) {
-            faultOption = theSimulation->theSettings->faultOption;
-        }
         // The default is to record the fault and keep going
-        if(faultOption == 0) { // record fault and continue
+        if(faultOption != 1) { // record fault and continue
             nextEventTime = std::min(endTime, nextFaultTime);
             if(nextEventTime > currentTime) {
                 return true; // add us back into the the event queue and continue the flight
             // but if we happen to be done with the flight at the same time as the fault, then process the flight completeion
             }
         } else {
-            /**********************************************************************************************************************************/
-            /**********************************************************************************************************************************/
-            // Add Plane to Plane Queue **************************************************** TO DO
             recordFlight();
+            if(theSimulation && theSimulation->thePlaneQueue) {
+                // "this" will be deleted so the plane will be owned by the plane queue
+                // We ground it by giving it an infinite delay
+                theSimulation->thePlaneQueue->addPlane(LONG_MAX, thePlane);
+            }
             return false; // do not keep us in the event queue
         }
     }
@@ -50,9 +54,21 @@ bool Flight::handleEvent(long currentTime, bool closeOut) {
     thePlane->decrementNextFaultInterval(endTime - startOfCurrentFaultInterval);
 
     recordFlight();
-    if(theSimulation && theSimulation->theChargerQueue) {
-        theSimulation->theChargerQueue->addPlane(currentTime, thePlane); // "this" will be deleted so the plane will be owned by the battery queue
+    if(faultOption == 1 && faultCount > 0) {
+        // faultOption == 1 means we ground flight with faults afer the flight completes
+        if(theSimulation && theSimulation->thePlaneQueue) {
+            // We ground it by giving it an infinite delay
+            theSimulation->thePlaneQueue->addPlane(LONG_MAX, thePlane);
+        }
+   } else {
+        // Otherwise put it back on the charger
+       if(theSimulation && theSimulation->theChargerQueue) {
+            // "this" will be deleted so the plane will be owned by the battery queue
+            theSimulation->theChargerQueue->addPlane(currentTime, thePlane);
+        }
     }
+    // by returning false "this" will be removed from the eventHandler queue
+    // and owned by the Charger or Plane queue
     return false; // do not keep us in the event queue
 }
 long Flight::countPlanes() {

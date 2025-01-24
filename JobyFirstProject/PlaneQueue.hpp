@@ -81,9 +81,9 @@ public:
     // Fill the vector with planes with possible delays according to the settings.
     // In a simulation, these will then be put into flights as their time arrives,
     // which will be immediately if the option is no passenger delays.
-    // If count >= minOfEachKind and count >= "the number of plane kinds" there will
-    // at least be minOfEachKind planes of each kind.
-    void generatePlanes(long currentTime, long count, long minOfEachKind);
+    // If count >= minOfEachCompany and count >= "the number of plane Companys" there will
+    // at least be minOfEachCompany planes of each Company.
+    void generatePlanes(long currentTime, long count, long minOfEachCompany);
  
     // For testing: remove the next Plane from the vector independent of timing
     // and return it to the caller.
