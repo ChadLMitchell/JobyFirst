@@ -87,8 +87,8 @@ void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachComp
     for(long planesAllocated = 0; planesAllocated < count; planesAllocated++) {
         // initally they can be totally random.
         long thisCompany = rand() % (maxCompany + 1);
-        // Test if we reach a point where we need to be more careful about our allocations
-        if(planesAllocated >= count - totalCompanyStillNeeded) {
+        // As long as we need some minimums, make sure we do those
+        if(totalCompanyStillNeeded > 0) {
             // if so, adjust the selection until we find a Company needed
             long originalCompany = thisCompany; // save it to test for infinite loop
             while(neededOfCompany[thisCompany] <= 0) {

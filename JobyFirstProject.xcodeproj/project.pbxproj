@@ -6,6 +6,17 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		838D6FD02D42CCE9006B64C7 /* ChargerQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FB92D42CCE9006B64C7 /* ChargerQueue.cpp */; };
+		838D6FD32D42CCE9006B64C7 /* EventHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FBF2D42CCE9006B64C7 /* EventHandler.cpp */; };
+		838D6FD42D42CCE9006B64C7 /* Flight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FC12D42CCE9006B64C7 /* Flight.cpp */; };
+		838D6FD72D42CCE9006B64C7 /* Passenger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FC62D42CCE9006B64C7 /* Passenger.cpp */; };
+		838D6FD82D42CCE9006B64C7 /* Plane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FC82D42CCE9006B64C7 /* Plane.cpp */; };
+		838D6FD92D42CCE9006B64C7 /* PlaneQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FCA2D42CCE9006B64C7 /* PlaneQueue.cpp */; };
+		838D6FDA2D42CCE9006B64C7 /* SimClock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FCC2D42CCE9006B64C7 /* SimClock.cpp */; };
+		838D6FDB2D42CCE9006B64C7 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FCF2D42CCE9006B64C7 /* Simulation.cpp */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		8326908B2D3B5AEF003D31F7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -24,6 +35,23 @@
 		83859BBB2D3C52850020DC41 /* Ideas.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Ideas.md; sourceTree = "<group>"; };
 		83859BC32D3C52A90020DC41 /* JobyCalculations.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = JobyCalculations.xlsx; sourceTree = "<group>"; };
 		83859BC42D3C52A90020DC41 /* JobyProject.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = JobyProject.jpg; sourceTree = "<group>"; };
+		838D6FB92D42CCE9006B64C7 /* ChargerQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChargerQueue.cpp; sourceTree = "<group>"; };
+		838D6FBA2D42CCE9006B64C7 /* CmdLineMenus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CmdLineMenus.hpp; sourceTree = "<group>"; };
+		838D6FBE2D42CCE9006B64C7 /* EventHandler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = EventHandler.hpp; sourceTree = "<group>"; };
+		838D6FBF2D42CCE9006B64C7 /* EventHandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EventHandler.cpp; sourceTree = "<group>"; };
+		838D6FC02D42CCE9006B64C7 /* Flight.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Flight.hpp; sourceTree = "<group>"; };
+		838D6FC12D42CCE9006B64C7 /* Flight.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Flight.cpp; sourceTree = "<group>"; };
+		838D6FC52D42CCE9006B64C7 /* Passenger.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Passenger.hpp; sourceTree = "<group>"; };
+		838D6FC62D42CCE9006B64C7 /* Passenger.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Passenger.cpp; sourceTree = "<group>"; };
+		838D6FC72D42CCE9006B64C7 /* Plane.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Plane.hpp; sourceTree = "<group>"; };
+		838D6FC82D42CCE9006B64C7 /* Plane.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Plane.cpp; sourceTree = "<group>"; };
+		838D6FC92D42CCE9006B64C7 /* PlaneQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PlaneQueue.hpp; sourceTree = "<group>"; };
+		838D6FCA2D42CCE9006B64C7 /* PlaneQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneQueue.cpp; sourceTree = "<group>"; };
+		838D6FCB2D42CCE9006B64C7 /* SimClock.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SimClock.hpp; sourceTree = "<group>"; };
+		838D6FCC2D42CCE9006B64C7 /* SimClock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SimClock.cpp; sourceTree = "<group>"; };
+		838D6FCD2D42CCE9006B64C7 /* SimSettings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SimSettings.hpp; sourceTree = "<group>"; };
+		838D6FCE2D42CCE9006B64C7 /* Simulation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Simulation.hpp; sourceTree = "<group>"; };
+		838D6FCF2D42CCE9006B64C7 /* Simulation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -48,8 +76,9 @@
 		832690842D3B5AEF003D31F7 = {
 			isa = PBXGroup;
 			children = (
-				83859BC52D3C52C60020DC41 /* Support Files */,
 				8326908F2D3B5AEF003D31F7 /* JobyFirstProject */,
+				838D6FE52D433781006B64C7 /* Simulation */,
+				83859BC52D3C52C60020DC41 /* Support Files */,
 				8326908E2D3B5AEF003D31F7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,6 +100,30 @@
 				83859BC42D3C52A90020DC41 /* JobyProject.jpg */,
 			);
 			path = "Support Files";
+			sourceTree = "<group>";
+		};
+		838D6FE52D433781006B64C7 /* Simulation */ = {
+			isa = PBXGroup;
+			children = (
+				838D6FB92D42CCE9006B64C7 /* ChargerQueue.cpp */,
+				838D6FBA2D42CCE9006B64C7 /* CmdLineMenus.hpp */,
+				838D6FBE2D42CCE9006B64C7 /* EventHandler.hpp */,
+				838D6FBF2D42CCE9006B64C7 /* EventHandler.cpp */,
+				838D6FC02D42CCE9006B64C7 /* Flight.hpp */,
+				838D6FC12D42CCE9006B64C7 /* Flight.cpp */,
+				838D6FC52D42CCE9006B64C7 /* Passenger.hpp */,
+				838D6FC62D42CCE9006B64C7 /* Passenger.cpp */,
+				838D6FC72D42CCE9006B64C7 /* Plane.hpp */,
+				838D6FC82D42CCE9006B64C7 /* Plane.cpp */,
+				838D6FC92D42CCE9006B64C7 /* PlaneQueue.hpp */,
+				838D6FCA2D42CCE9006B64C7 /* PlaneQueue.cpp */,
+				838D6FCB2D42CCE9006B64C7 /* SimClock.hpp */,
+				838D6FCC2D42CCE9006B64C7 /* SimClock.cpp */,
+				838D6FCD2D42CCE9006B64C7 /* SimSettings.hpp */,
+				838D6FCE2D42CCE9006B64C7 /* Simulation.hpp */,
+				838D6FCF2D42CCE9006B64C7 /* Simulation.cpp */,
+			);
+			path = Simulation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -136,6 +189,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				838D6FD02D42CCE9006B64C7 /* ChargerQueue.cpp in Sources */,
+				838D6FD32D42CCE9006B64C7 /* EventHandler.cpp in Sources */,
+				838D6FD42D42CCE9006B64C7 /* Flight.cpp in Sources */,
+				838D6FD72D42CCE9006B64C7 /* Passenger.cpp in Sources */,
+				838D6FD82D42CCE9006B64C7 /* Plane.cpp in Sources */,
+				838D6FD92D42CCE9006B64C7 /* PlaneQueue.cpp in Sources */,
+				838D6FDA2D42CCE9006B64C7 /* SimClock.cpp in Sources */,
+				838D6FDB2D42CCE9006B64C7 /* Simulation.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
