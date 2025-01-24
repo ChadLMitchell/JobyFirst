@@ -11,6 +11,7 @@
 #include "DebugHelp.hpp"
 #include "CmdLineMenus.hpp"
 #include "TestsMenu.hpp"
+#include "SettingsMenu.hpp"
 #include "MenuGroupWithAllOption.hpp"
 #include "Plane.hpp"
 #include "SimClock.hpp"
@@ -143,7 +144,8 @@ bool doQuit(int selector, MenuGroup &thisMenuGroup) {
 
 vector<MenuItem> mainMenus {
     MenuItem('T', string{"Run Tests"}, &runTests, 0),
-    MenuItem('S', string{"Run Simulation (3 hours)"}, &runSimulation, 0),
+    MenuItem('S', string{"Edit Settings"}, &editSettings, 0),
+    MenuItem('R', string{"Run Simulation (3 hours)"}, &runSimulation, 0),
     MenuItem('V', string{"Run Simulation Verbose (3 hours)"}, &runSimulation, 1),
     MenuItem('2', string{"Run 30-hour Simulation)"}, &runSimulation, 2),
     MenuItem('3', string{"Run 300-hour Simulation"}, &runSimulation, 3),

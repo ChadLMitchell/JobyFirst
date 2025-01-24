@@ -9,5 +9,8 @@
 #define SettingsMenu_hpp
 
 #include <stdio.h>
+#include "CmdLineMenus.hpp"
+
+bool editSettings(int selector, MenuGroup &thisMenuGroup);
 
 #endif /* SettingsMenu_hpp */
