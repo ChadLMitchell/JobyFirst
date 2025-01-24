@@ -41,13 +41,15 @@ struct PlaneQueueStatusItem {
  * never wait for passengers, then this is a place to create the initial collection of planes.
  * It is also a place to put planes that are grounded due to faults if that option is chosen.
  *
+ * This is a child of eventHandler. As such, it will be added to the SimClock queue.
+ *
  * A Simulation object will contain exactly one PlaneQueue.
  * If the PlaneQueue object is in a Simulation it has a pointer to that Simulation object.
- * For testing, a PlaneQueue may have a nullptr for theSimulation.
+ * For testing, a PlaneQueue may have a nullptr for theSimulation property.
  *******************************************************************************************
  */
 class PlaneQueue: public EventHandler {
-    Simulation *theSimulation; // Simulation object containing this or nullptr
+    Simulation *theSimulation; // Simulation object containing current simulation or nullptr
     bool verboseTesting; // Option for testing to have the class output action descriptions
     // The following is a vector, not a queue because it is kept soonest at tne end and
     // we can add a Plane to it that has a our of order passengerDelay

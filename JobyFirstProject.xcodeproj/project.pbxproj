@@ -35,8 +35,8 @@
 		83859BBB2D3C52850020DC41 /* Ideas.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Ideas.md; sourceTree = "<group>"; };
 		83859BC32D3C52A90020DC41 /* JobyCalculations.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = JobyCalculations.xlsx; sourceTree = "<group>"; };
 		83859BC42D3C52A90020DC41 /* JobyProject.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = JobyProject.jpg; sourceTree = "<group>"; };
+		838D6FB82D42CCE9006B64C7 /* ChargerQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChargerQueue.hpp; sourceTree = "<group>"; };
 		838D6FB92D42CCE9006B64C7 /* ChargerQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ChargerQueue.cpp; sourceTree = "<group>"; };
-		838D6FBA2D42CCE9006B64C7 /* CmdLineMenus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CmdLineMenus.hpp; sourceTree = "<group>"; };
 		838D6FBE2D42CCE9006B64C7 /* EventHandler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = EventHandler.hpp; sourceTree = "<group>"; };
 		838D6FBF2D42CCE9006B64C7 /* EventHandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EventHandler.cpp; sourceTree = "<group>"; };
 		838D6FC02D42CCE9006B64C7 /* Flight.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Flight.hpp; sourceTree = "<group>"; };
@@ -106,7 +106,6 @@
 			isa = PBXGroup;
 			children = (
 				838D6FB92D42CCE9006B64C7 /* ChargerQueue.cpp */,
-				838D6FBA2D42CCE9006B64C7 /* CmdLineMenus.hpp */,
 				838D6FBE2D42CCE9006B64C7 /* EventHandler.hpp */,
 				838D6FBF2D42CCE9006B64C7 /* EventHandler.cpp */,
 				838D6FC02D42CCE9006B64C7 /* Flight.hpp */,
@@ -122,6 +121,7 @@
 				838D6FCD2D42CCE9006B64C7 /* SimSettings.hpp */,
 				838D6FCE2D42CCE9006B64C7 /* Simulation.hpp */,
 				838D6FCF2D42CCE9006B64C7 /* Simulation.cpp */,
+				838D6FB82D42CCE9006B64C7 /* ChargerQueue.hpp */,
 			);
 			path = Simulation;
 			sourceTree = "<group>";

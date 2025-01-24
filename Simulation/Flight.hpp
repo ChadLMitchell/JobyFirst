@@ -12,6 +12,20 @@
 #include "SimClock.hpp"
 #include "Plane.hpp"
 
+/*
+ *******************************************************************************************
+ * class Flight
+ * This represents a single flight and contains a plane object..
+ *
+ * This is a child of eventHandler. As such, it will be added to the SimClock queue.
+ * It will respond to events that complete the flight or that represent faults.
+ * After a flight it transfers the plane to theChargerQueue or thePlaneQueue.
+ *
+ * A Simulation object may contain zero or more Flight objects.
+ * If the Flight object is in a Simulation it has a pointer to that Simulation object.
+ * For testing, a Flight may have a nullptr for theSimulation property.
+ *******************************************************************************************
+ */
 class Flight: public EventHandler {
     long startTime;
     long endTime;

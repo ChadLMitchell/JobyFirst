@@ -25,13 +25,6 @@ void SimClock::addHandler(std::shared_ptr<EventHandler> aHandler) {
         handlerPtr++;
     }
     eventHandlers.insert(handlerPtr, aHandler);
-    /*********************************************************************************************/
-                    if(!checkSort()) {
-                        std::cout << "Error in SimClock::run(): not sorted after addHandler" << std::endl;
-                        std::cout << "    Added " << aHandler->describe() << std::endl;
-                    }
-                    /*********************************************************************************************/
-
 }
 void SimClock::reSortHandler(std::shared_ptr<EventHandler> aHandler) {
     auto handlerPtr = begin(eventHandlers);
@@ -43,13 +36,6 @@ void SimClock::reSortHandler(std::shared_ptr<EventHandler> aHandler) {
         }
         handlerPtr++;
     }
-    /*********************************************************************************************/
-                    if(!checkSort()) {
-                        std::cout << "Error in SimClock::run(): not sorted after reSortHandler" << std::endl;
-                        std::cout << "    Readded " << aHandler->describe() << std::endl;
-                    }
-                    /*********************************************************************************************/
-
 }
 void SimClock::markNeedSort()
 {
@@ -78,11 +64,6 @@ bool SimClock::run(bool verbose) {
             std::cout << "Error in SimClock::run(): Out of order nextEventTime" << std::endl;
             std::cout << "currentTime: " << currentTime << std::endl;
             std::cout << "nextTime: " << nextTime << " for" << nextEventHandler-> describe() << std::endl;
-            /*********************************************************************************************/
-                            if(checkSort()) {
-                                std::cout << "Still says it is sorted" << std::endl;
-                            }
-                            /*********************************************************************************************/
         }
         if(nextTime >= endTime) {
             
@@ -98,33 +79,11 @@ bool SimClock::run(bool verbose) {
             std::cout << "Advancing time to " << nextTime << std::endl;
         }
         currentTime = nextTime;
-        /*********************************************************************************************/
-        if(!eventHandlers.empty() && eventHandlers.back()->getNextEventTime() < currentTime) {
-                            std::cout << "Error in SimClock::run(): just updated currentTime and it is > the following Eventhandler time" << std::endl;
-            std::cout << "    following Eventhandler time: " << eventHandlers.back()->getNextEventTime() << std::endl;
-            std::cout << "    following Eventhandler: " << eventHandlers.back()->describe() << std::endl;
-                        }
-                        /*********************************************************************************************/
-       if(verbose) {
+        if(verbose) {
             std::cout << "Call handleEvent() for " << nextEventHandler->describe() << std::endl;
         }
-        /*********************************************************************************************/
-                        if(!checkSort()) {
-                            std::cout << "Error in SimClock::run(): not sorted before handleEvent" << std::endl;
-                            std::cout << "    nextEventHandler: " << nextEventHandler->describe() << std::endl;
-                        }
-                        /*********************************************************************************************/
         if(nextEventHandler->handleEvent(currentTime, false)) {
-            /*********************************************************************************************/
-            if(!eventHandlers.empty() && eventHandlers.back()->getNextEventTime() < currentTime) {
-                                std::cout << "Error in SimClock::run(): just handled event and currentTime is > the following Eventhandler time" << std::endl;
-                std::cout << "    Sorted status: " << checkSort() << std::endl;
-                std::cout << "    current Eventhandler: " << nextEventHandler->describe() << std::endl;
-                std::cout << "    following Eventhandler time: " << eventHandlers.back()->getNextEventTime() << std::endl;
-                std::cout << "    following Eventhandler: " << eventHandlers.back()->describe() << std::endl;
-                            }
-                            /*********************************************************************************************/
-           if(verbose) {
+            if(verbose) {
                 std::cout << "Keeping event handler in SimClock queue" << std::endl;
             }
             if(currentTime >= nextEventHandler->getNextEventTime()) {
@@ -138,13 +97,6 @@ bool SimClock::run(bool verbose) {
                     std::cout << "Adding handler for " << nextEventHandler->describe() << " back to SimClock queue" << std::endl;
                 }
                 addHandler(nextEventHandler);
-                /*********************************************************************************************/
-                if(!eventHandlers.empty() && eventHandlers.back()->getNextEventTime() < currentTime) {
-                                    std::cout << "Error in SimClock::run(): just readded event and currentTime is > the following Eventhandler time" << std::endl;
-                    std::cout << "    following Eventhandler time: " << eventHandlers.back()->getNextEventTime() << std::endl;
-                    std::cout << "    following Eventhandler: " << eventHandlers.back()->describe() << std::endl;
-                                }
-                                /*********************************************************************************************/
             }
         } else {
             if(verbose) {
@@ -152,13 +104,6 @@ bool SimClock::run(bool verbose) {
             }
 
         }
-        /*********************************************************************************************/
-                        if(!checkSort()) {
-                            std::cout << "Error in SimClock::run(): not sorted at end of loop" << std::endl;
-                            std::cout << "    nextEventHandler: " << nextEventHandler->describe() << std::endl;
-                        }
-                        /*********************************************************************************************/
-
     }
     // Close out remaining handlers
     for(std::shared_ptr<EventHandler> remainingEventHandler: eventHandlers) {

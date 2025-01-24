@@ -47,8 +47,6 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
         }
 
         chargers.pop_back();
-//        if(theSimulation && theSimulation->theSimClock) {
-//            theSimulation->theSimClock->addHandler(std::make_shared<Flight>(theSimulation, currentTime, Passenger::getPassengerCount(thePlane->getMaxPassengerCount(), theSimulation->theSettings),thePlane));
         if(theSimulation && theSimulation->thePlaneQueue) {
             theSimulation->thePlaneQueue->addPlane(currentTime + Passenger::getPassengerDelay(theSimulation->theSettings),thePlane);
         } else if(verboseTesting) {
