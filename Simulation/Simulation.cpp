@@ -31,7 +31,10 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     theSimClock->run(verbose);
     auto stopTimer = std::chrono::high_resolution_clock::now();
     auto duration = duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
-    std::cout << "Time taken by simulation: " << duration.count() << " microseconds" << std::endl;
+    double secondsTaken = duration.count() / 1000000.0;
+    std::cout << "Time taken by simulation: "
+    << duration.count() << " microseconds ("
+    << secondsTaken << " seconds)" << std::endl;
 
     // First summarize the flight stat data and charger stat data
     long flightCounts[maxCompany+1]{};
@@ -104,7 +107,9 @@ std::vector<FinalStats> Simulation::run(bool verbose)
         totalFlights += flightCounts[c];
         totalCharges += chargeCounts[c];
         double flightCountD = flightCounts[c]; // so we do floating point math
+        if(flightCountD <= 0) flightCountD = 1.0; // so we avoid division by 0
         double chargeCountD = chargeCounts[c]; // so we do floating point math
+        if(chargeCountD <= 0) chargeCountD = 1.0; // so we avoid division by 0
         double averageTime = totalFlightStats[c].duration/flightCountD;
         FinalStats stats{c,  flightCounts[c], averageTime,
             averageTime * planeSpecifications[c].cruise_speed__mph / seconds_per_hour,

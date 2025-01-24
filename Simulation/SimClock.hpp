@@ -22,43 +22,54 @@
  * with the earliest time is at the end ready to be popped off.
  *
  * This uses a "quantum" clock meaning that the time jumps from one meaningful time to the
- * next without passing through the times in between. It required all EventHandlers to be able
- * to pre-calculate when the next event they will care about will happen so the SimClock
- * can skip directly to the next time that matters.
+ * next without passing through the times in between. It requires all EventHandlers to be
+ * able to pre-calculate when the next event they will care about will happen so the
+ * SimClock can skip directly to the next time that matters.
  *
  * All handlers will be descendants of EventHandler.
  *
  * Once everything is set up, the simulation proceeds by calling the run() in this object.
- * never wait for passengers, then this is a place to create the initial collection of planes.
- * It is also a place to put planes that are grounded due to faults if that option is chosen.
- *
- * This is a child of eventHandler. As such, it will be added to the SimClock queue.
- *
- * A Simulation object will contain exactly one SimClock.
- * If the PlaneQueue object is in a Simulation it has a pointer to that Simulation object.
- * For testing, a PlaneQueue may have a nullptr for theSimulation property.
+ * That function will loop until time runs out for the simulation or until there are no
+ * more EventHandlers listed.
  *******************************************************************************************
  */
 class SimClock {
-    Simulation *theSimulation;
-    long endTime;
-    long currentTime;
-    bool needSort;
-    std::vector<std::shared_ptr<EventHandler>> eventHandlers;
-        // TO DO: consider using a list for performance later
+    Simulation *theSimulation; // Simulation object containing current simulation or nullptr
+    long endTime; // When does this simulation end?
+    long currentTime; // The current clock time
+    bool needSort; // Set if another object might cause the handler queue to become unsorted.
+                    // It is checked at the start of each clock loop inside run().
+    std::vector<std::shared_ptr<EventHandler>> eventHandlers; // The sorged list of handlers
+    
+    // This function is private so only this object can call it at times that are safe
     void sortHandlers();
 public:
     SimClock(Simulation *theSimulation, long endTime);
     ~SimClock();
+    
+    // Get the current clock time
     long getTime();
+    
+    // Add a handler to the vector, inserting it in sorted order
     void addHandler(std::shared_ptr<EventHandler> aHandler);
+    
+    // Remove and re-add this handler. Probably faster than a full sort
     void reSortHandler(std::shared_ptr<EventHandler> aHandler);
+    
+    // Set the private property indicating a sort is needed
     void markNeedSort();
+    
+    // For testing: check if the vector is properly sorted
     bool checkSort(); // for testing
+    
+    // The core loop of the simulation clock. If verbose, provide more details to cout during execution.
     bool run(bool verbose);
+    
+    // For testing: sum all the planes in all of the handlers
     long countPlanes();
 };
 
+// Test the class to validate some functionality
 bool testSimClock(long howLongSeconds);
 
 #endif /* SimClock_hpp */

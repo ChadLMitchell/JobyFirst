@@ -11,6 +11,11 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+
+
+// These are settings for the simulator. We can pass a copy of these into the Simulator
+// constructor to run with these. To use the defaults, create a SimSettings object with
+// the default values.
 struct SimSettings {
     
     int passengerCountOption = 0;
@@ -35,6 +40,7 @@ struct SimSettings {
     long minPlanePerKind = 1;
 };
 
+// These are used to help us convert from hours and minutes to seconds
 const long defaultTestClockSeconds{60*60*3}; //3 hours
 const long shortTestClockSeconds{60}; //1 minute
 const long longTestClockSeconds{60*60*30}; //30 hours

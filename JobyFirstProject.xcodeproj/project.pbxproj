@@ -76,6 +76,7 @@
 		832690842D3B5AEF003D31F7 = {
 			isa = PBXGroup;
 			children = (
+				838D6FE62D43E448006B64C7 /* Interface */,
 				8326908F2D3B5AEF003D31F7 /* JobyFirstProject */,
 				838D6FE52D433781006B64C7 /* Simulation */,
 				83859BC52D3C52C60020DC41 /* Support Files */,
@@ -119,11 +120,18 @@
 				838D6FCA2D42CCE9006B64C7 /* PlaneQueue.cpp */,
 				838D6FCB2D42CCE9006B64C7 /* SimClock.hpp */,
 				838D6FCC2D42CCE9006B64C7 /* SimClock.cpp */,
-				838D6FCD2D42CCE9006B64C7 /* SimSettings.hpp */,
-				838D6FCE2D42CCE9006B64C7 /* Simulation.hpp */,
 				838D6FCF2D42CCE9006B64C7 /* Simulation.cpp */,
 			);
 			path = Simulation;
+			sourceTree = "<group>";
+		};
+		838D6FE62D43E448006B64C7 /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				838D6FCD2D42CCE9006B64C7 /* SimSettings.hpp */,
+				838D6FCE2D42CCE9006B64C7 /* Simulation.hpp */,
+			);
+			path = Interface;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

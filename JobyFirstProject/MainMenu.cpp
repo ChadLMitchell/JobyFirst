@@ -23,6 +23,7 @@
 
 using namespace std;
 
+// Refer to the current settings to be used in creating simulations
 extern SimSettings currentSettings;
 
 void outputResults(std::vector<FinalStats> results)
@@ -40,30 +41,42 @@ void outputResults(std::vector<FinalStats> results)
     // };
     
     // Statistics from this simulation
-    cout << left << setw(16) << "Company"
-    << left << setw(14) << "Total Flights "
-    << left << setw(17) << "Avg. Time/Flight "
-    << left << setw(18) << "Avg. Dist./Flight "
-    << left << setw(14) << "Total Charges "
-    << left << setw(17) << "Avg. Time/Charge "
-    << left << setw(13) << "Total Faults "
-    << left << setw(21) << "Total Passenger Miles"
+    cout << left << setw(17) << "Company"
+    << left << setw(9) << "Total "
+    << left << setw(13) << "Avgerage "
+    << left << setw(14) << "Avgerage "
+    << left << setw(9) << "Total  "
+    << left << setw(13) << "Avgerage "
+    << left << setw(8) << "Total "
+    << left << setw(15) << "Total"
+    << endl;
+    cout << left << setw(17) << ""
+    << left << setw(9) << "Flights "
+    << left << setw(13) << "Time/Flight "
+    << left << setw(14) << "Miles/Flight "
+    << left << setw(9) << "Charges "
+    << left << setw(13) << "Time/Charge "
+    << left << setw(8) << "Faults "
+    << left << setw(15) << "Passenger Miles"
     << endl;
     for(auto r: results) {
-        cout << left << setw(16) << companyName(r.theCompany)
-        << left << setw(14) << r.totalFlights
-        << left << setw(17) << r.averageTimePerFlight
-        << left << setw(18) << r.averageDistancePerFlight
-        << left << setw(14) << r.totalCharges
-        << left << setw(17) << r.averageTimeCharging
-        << left << setw(13) << r.totalFaults
-        << left << setw(21) << r.totalPassengerMiles
+        cout << setprecision(2) << fixed
+        << left << setw(17) << companyName(r.theCompany)
+        << left << setw(9) << r.totalFlights
+        << left << setw(13) << r.averageTimePerFlight
+        << left << setw(14) << r.averageDistancePerFlight
+        << left << setw(9) << r.totalCharges
+        << left << setw(13) << r.averageTimeCharging
+        << left << setw(8) << r.totalFaults
+        << left << setw(15) << r.totalPassengerMiles
         << endl;
     }
 
 }
 bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     debugMessage("===> Selected Run Simulation");
+    // Make a copy of the current settings so any changes we make here are
+    // temporary and do not affect future simulations
     SimSettings runSettings = currentSettings;
     if(selector == 2) {
         runSettings.simulationDuration = longTestClockSeconds; // 30 hours
@@ -72,9 +85,11 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     } else if(selector == 4) {
         runSettings.simulationDuration = longTestClockSeconds * 100; // 3000 hours
     } else if(selector == 5) {
-        runSettings.simulationDuration = longTestClockSeconds * 1000; // 3000 hours
+        runSettings.simulationDuration = longTestClockSeconds * 1000; // 30,000 hours
+    } else if(selector == 6) {
+        runSettings.simulationDuration = longTestClockSeconds * 106000; // 300,000 hours
     }
-    
+
     Simulation aSimulation(runSettings);
     std::vector<FinalStats> results = aSimulation.run(selector == 1 ? true : false);
     
@@ -121,7 +136,11 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
     }
     auto stopTimer = std::chrono::high_resolution_clock::now();
     auto duration = duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
-    std::cout << "Total time taken by all simulations: " << duration.count() << " microseconds" << std::endl;
+    double secondsTaken = duration.count() / 1000000.0;
+
+    std::cout << "Total time taken by all simulations: "
+    << duration.count() << " microseconds ("
+    << secondsTaken << " seconds)" << std::endl;
 
     // turn totals into averages
     for(auto c: allCompany) {
@@ -147,13 +166,14 @@ bool doQuit(int selector, MenuGroup &thisMenuGroup) {
 vector<MenuItem> mainMenus {
     MenuItem('T', string{"Run Tests"}, &runTests, 0),
     MenuItem('S', string{"Edit Settings"}, &editSettings, 0),
-    MenuItem('R', string{"Run Simulation (3 hours)"}, &runSimulation, 0),
-    MenuItem('V', string{"Run Simulation Verbose (3 hours)"}, &runSimulation, 1),
+    MenuItem('R', string{"Run Default Duration Simulation"}, &runSimulation, 0),
+    MenuItem('V', string{"Run Default Duration Simulation Verbose"}, &runSimulation, 1),
     MenuItem('2', string{"Run 30-hour Simulation)"}, &runSimulation, 2),
-    MenuItem('3', string{"Run 300-hour Simulation"}, &runSimulation, 3),
-    MenuItem('4', string{"Run 3000-hour Simulation"}, &runSimulation, 4),
-    MenuItem('5', string{"Run 30000-hour Simulation"}, &runSimulation, 5),
-    MenuItem('6', string{"Average results from 100 3-hour Simulations"}, &runMultiple, 6),
+    MenuItem('3', string{"Run 300-hour (12.5 Day) Simulation"}, &runSimulation, 3),
+    MenuItem('4', string{"Run 3000-hour (125 Day) Simulation"}, &runSimulation, 4),
+    MenuItem('5', string{"Run 30,000-hour (1250 Day) Simulation"}, &runSimulation, 5),
+    MenuItem('6', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
+    MenuItem('7', string{"Average results from 100 3-hour Simulations"}, &runMultiple, 0),
     MenuItem('Q', string{"Quit"}, &doQuit, 0)
 };
 MenuGroup mainMenu = MenuGroup(mainMenus);

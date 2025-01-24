@@ -16,6 +16,9 @@
 #include "SimSettings.hpp"
 using namespace std;
 
+// Refer to the current settings to be used in creating simulations
+extern SimSettings currentSettings;
+
 bool setChargerCount(int selector, MenuGroup &thisMenuGroup) {
     cout << "Chose setChargerCount (to be implemented later)" << endl;
     return false;
@@ -36,10 +39,23 @@ bool setPassengerOption(int selector, MenuGroup &thisMenuGroup) {
     cout << "Chose setPassengerOption (to be implemented later)" << endl;
     return false;
 }
+
+// Implement a menu that selects the value for currentSettings.faultOption
+bool selectFaultOption(int selector, MenuGroup &thisMenuGroup) {
+    currentSettings.faultOption = selector;
+    return true;
+}
+vector<MenuItem> faultOptionMenus {
+    MenuItem('1', string{"Just Count Faults"}, &selectFaultOption, 0),
+    MenuItem('2', string{"On Fault, Ground Plane Immediately"}, &selectFaultOption, 1),
+    MenuItem('3', string{"On Fault, Ground Plane at End of Flight"}, &selectFaultOption, 2),
+};
+MenuGroup faultOptionMenu = MenuGroup(faultOptionMenus);
 bool setFaultOption(int selector, MenuGroup &thisMenuGroup) {
-    cout << "Chose setFaultOption (to be implemented later)" << endl;
+    faultOptionMenu.runMenu();
     return false;
 }
+
 bool returnToMainMenu(int selector, MenuGroup &thisMenuGroup) {
     debugMessage("===> Chose return to main menu\n");
     return true;
