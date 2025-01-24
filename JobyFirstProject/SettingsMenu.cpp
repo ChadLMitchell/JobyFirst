@@ -36,8 +36,35 @@ bool setDuration(int selector, MenuGroup &thisMenuGroup) {
     cout << "Chose setDuration (to be implemented later)" << endl;
     return false;
 }
-bool setPassengerOption(int selector, MenuGroup &thisMenuGroup) {
-    cout << "Chose setPassengerOption (to be implemented later)" << endl;
+
+// Implement a menu that selects the value for currentSettings.maxPassengerDelay
+bool selectPassengerCountOption(int selector, MenuGroup &thisMenuGroup) {
+    currentSettings.passengerCountOption = selector;
+    return true;
+}
+vector<MenuItem> passengerCountOptionMenus {
+    MenuItem('1', string{"Planes Always Fly Full"}, &selectPassengerCountOption, 0),
+    MenuItem('2', string{"Randomly Distribute Pasengers Count on [1..Max]"}, &selectPassengerCountOption, 1),
+};
+MenuGroup passengerCountOptionMenu = MenuGroup(passengerCountOptionMenus);
+bool setPassengerCountOption(int selector, MenuGroup &thisMenuGroup) {
+    passengerCountOptionMenu.runMenu();
+    return false;
+}
+
+// Implement a menu that inputs the value for currentSettings.maxPassengerDelay
+bool selectPassengerDelayOption(int selector, MenuGroup &thisMenuGroup) {
+    currentSettings.maxPassengerDelay = selector;
+    return true;
+}
+long getNumberFromUser(string prompt) {
+    cout << prompt << endl;
+    long result;
+    cin >> result;
+    return result;
+}
+bool setPassengerDelayOption(int selector, MenuGroup &thisMenuGroup) {
+    currentSettings.maxPassengerDelay = getNumberFromUser("passengerDelayOptionMenu.runMenu(");
     return false;
 }
 
@@ -67,8 +94,9 @@ vector<MenuItem> settingsMenus {
     MenuItem('2', string{"Set Plane Count"}, &setPlaneCount, 2),
     MenuItem('3', string{"Set Random Plane Option"}, &setRandomOption, 3),
     MenuItem('4', string{"Change Simulation Duration"}, &setDuration, 4),
-    MenuItem('5', string{"Set Passenger Count Option"}, &setPassengerOption, 5),
-    MenuItem('6', string{"Set Fault Option"}, &setFaultOption, 6),
+    MenuItem('5', string{"Set Passenger Count Option"}, &setPassengerCountOption, 5),
+    MenuItem('6', string{"Set Passenger Delay Option"}, &setPassengerDelayOption, 6),
+    MenuItem('7', string{"Set Fault Option"}, &setFaultOption, 7),
     MenuItem('M', string{"Return to Main Menu"}, &returnToMainMenu, 0)
 };
 MenuGroup settingsMenu = MenuGroup(settingsMenus);

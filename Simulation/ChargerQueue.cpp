@@ -67,7 +67,7 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
     return true;
 }
 long ChargerQueue::countPlanes() {
-    return chargers.size() + planesWaiting.size();
+    return static_cast<long>(chargers.size() + planesWaiting.size());
 }
 const std::string ChargerQueue::describe() {
     std::string description = "Charger Queue with " + std::to_string(chargers.size()) + " planes on chargers and " + std::to_string(planesWaiting.size()) + " planes waiting";
@@ -88,7 +88,8 @@ void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
         while(chargerPtr != end(chargers) &&  chargerPtr->timeDone > timeToCharged) {
             chargerPtr++;
         }
-        chargers.insert(chargerPtr, Charger(currentTime, timeToCharged, aPlane));
+        Charger aCharger = Charger(currentTime, timeToCharged, aPlane);
+        chargers.insert(chargerPtr, aCharger);
         
         // if our earliest charger done time has changed, we need to be resorted in the SimClock
         if(nextEventTime != chargers.back().timeDone) {

@@ -45,7 +45,7 @@ bool PlaneQueue::handleEvent(long currentTime, bool closeOut) {
     return true;
 }
 long PlaneQueue::countPlanes() {
-    return planesWaiting.size();
+    return static_cast<long>(planesWaiting.size());
 }
 const std::string PlaneQueue::describe() {
     std::string description = "Plane Queue containing " + std::to_string(countPlanes()) + " planes";
@@ -59,7 +59,8 @@ void PlaneQueue::addPlane(long delayUntil, std::shared_ptr<Plane> aPlane) {
     while(planePtr != end(planesWaiting) &&  planePtr->nextFlightTime > delayUntil) {
         planePtr++;
     }
-    planesWaiting.insert(planePtr, PlaneQueueItem(aPlane, delayUntil));
+    PlaneQueueItem queueItem = PlaneQueueItem(aPlane, delayUntil);
+    planesWaiting.insert(planePtr, queueItem);
     
     // if our nextFlightTime time has changed, we need to be resorted in the SimClock
     if(nextEventTime != planesWaiting.back().nextFlightTime) {
@@ -83,7 +84,7 @@ void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachComp
     long totalCompanyStillNeeded{minOfEachCompany * (maxCompany + 1)};
     
     // Allocate planes to random Companies, with constraints
-    Company companyChoices[count];
+    std::vector<Company> companyChoices(count);
     for(long planesAllocated = 0; planesAllocated < count; planesAllocated++) {
         // initally they can be totally random.
         long thisCompany = rand() % (maxCompany + 1);

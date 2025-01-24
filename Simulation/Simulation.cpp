@@ -31,7 +31,7 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     theSimClock->addHandler(thePlaneQueue);
     theSimClock->run(verbose);
     auto stopTimer = std::chrono::high_resolution_clock::now();
-    auto duration = duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
     double secondsTaken = duration.count() / 1000000.0;
     std::cout << "Time taken by simulation: "
     << duration.count() << " microseconds ("

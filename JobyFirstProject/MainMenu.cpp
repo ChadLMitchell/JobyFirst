@@ -89,7 +89,7 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     } else if(selector == 5) {
         runSettings.simulationDuration = longTestClockSeconds * 1000; // 30,000 hours
     } else if(selector == 6) {
-        runSettings.simulationDuration = longTestClockSeconds * 106000; // 300,000 hours
+        runSettings.simulationDuration = longTestClockSeconds * 10000; // 300,000 hours
     }
 
     Simulation aSimulation(runSettings);
@@ -137,7 +137,7 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
         }
     }
     auto stopTimer = std::chrono::high_resolution_clock::now();
-    auto duration = duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
     double secondsTaken = duration.count() / 1000000.0;
 
     std::cout << "Total time taken by all simulations: "
@@ -175,7 +175,7 @@ vector<MenuItem> mainMenus {
     MenuItem('4', string{"Run 3000-hour (125 Day) Simulation"}, &runSimulation, 4),
     MenuItem('5', string{"Run 30,000-hour (1250 Day) Simulation"}, &runSimulation, 5),
     MenuItem('6', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
-    MenuItem('7', string{"Average results from 100 3-hour Simulations"}, &runMultiple, 0),
+    MenuItem('7', string{"Average results from 100 Default Simulations"}, &runMultiple, 0),
     MenuItem('Q', string{"Quit"}, &doQuit, 0)
 };
 MenuGroup mainMenu = MenuGroup(mainMenus);
