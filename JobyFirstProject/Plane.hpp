@@ -18,12 +18,15 @@ enum Company {
     Delta,
     Echo
 };
+// extern const Company allCompany[];
+const Company allCompany[] = {Alpha, Bravo, Charlie, Delta, Echo};
+
 const Company minCompany{Alpha};
 const Company maxCompany{Echo};
 extern const char *companyNames[];
 const char *companyName(Company c);
 
-// Specifications provided by the task
+// Specifications provided by the assigned task
 struct PlaneSpecification {
     Company theCompany;
     double cruise_speed__mph;
@@ -47,6 +50,7 @@ public:
     const char *getCompanyName();
     int getPlaneNumber();
     const std::string describe();
+    long getMilesPerHour();
     long calcTimeToCharge__seconds();
     double calcDistanceFullCharge__miles(); // calculated value
     long calcTimeOnFullCharge__seconds(); // calculated value
@@ -54,7 +58,7 @@ public:
     long getMaxPassengerCount();
     
     long getNextFaultInterval();
-    long decrementNextFaultLinterval(long seconds);
+    long decrementNextFaultInterval(long seconds);
     long createFaultInterval();
 
     static bool validateSpecs(PlaneSpecification &spec);

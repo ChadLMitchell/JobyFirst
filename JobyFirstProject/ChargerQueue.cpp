@@ -8,6 +8,7 @@
 #include "ChargerQueue.hpp"
 #include "Plane.hpp"
 #include "Flight.hpp"
+#include "PlaneQueue.hpp"
 #include "Passenger.hpp"
 
 ChargerQueue::ChargerQueue(Simulation *theSimulation, long chargerCount):
@@ -15,7 +16,21 @@ EventHandler(LONG_MAX), theSimulation{theSimulation}, chargerCount{chargerCount}
 }
 ChargerQueue::~ChargerQueue() {
 }
-bool ChargerQueue::handleEvent(long currentTime) {
+bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
+    if(closeOut) {
+        // we are closing out the simualtion so mark all chargers as done
+        for(auto aCharger: chargers) {
+            aCharger.timeDone = currentTime;
+            if(theSimulation) {
+                // log this charge
+                theSimulation->theChargerStats.push_back(
+                    ChargerStats(aCharger.thePlane->getCompany(),
+                                 aCharger.thePlane->getPlaneNumber(),
+                                 currentTime - aCharger.timeStarted));
+            }
+        }
+        return false;
+    }
     if(chargers.empty()) {
         std::cout << "ChargerQueue::handleEvent should not be called with no chargers in use" <<  std::endl;
         return false;
@@ -23,11 +38,21 @@ bool ChargerQueue::handleEvent(long currentTime) {
     // Handle any planes that are now fully charged
     while(!chargers.empty() && chargers.back().timeDone <= currentTime) {
         std::shared_ptr<Plane> thePlane = chargers.back().thePlane;
+        if(theSimulation) {
+            // log this charge
+            theSimulation->theChargerStats.push_back(
+                ChargerStats(chargers.back().thePlane->getCompany(),
+                             chargers.back().thePlane->getPlaneNumber(),
+                             currentTime - chargers.back().timeStarted));
+        }
+
         chargers.pop_back();
-        if(theSimulation && theSimulation->theSimClock) {
-            theSimulation->theSimClock->addHandler(std::make_shared<Flight>(theSimulation, currentTime + thePlane->calcTimeOnFullCharge__seconds(), Passenger::getPassengerCount(thePlane->getMaxPassengerCount(), theSimulation->theSettings),thePlane));
+//        if(theSimulation && theSimulation->theSimClock) {
+//            theSimulation->theSimClock->addHandler(std::make_shared<Flight>(theSimulation, currentTime, Passenger::getPassengerCount(thePlane->getMaxPassengerCount(), theSimulation->theSettings),thePlane));
+        if(theSimulation && theSimulation->thePlaneQueue) {
+            theSimulation->thePlaneQueue->addPlane(currentTime + Passenger::getPassengerDelay(theSimulation->theSettings),thePlane);
         } else if(verboseTesting) {
-            std::cout << "Would add flight for " << thePlane->describe() << "to SimClock if Sim full simulation" << std::endl;
+            std::cout << "Would add flight for " << thePlane->describe() << "to thePlaneQueue if Sim full simulation" << std::endl;
         }
     }
     // move planes from waiting queue to charger vector
@@ -45,6 +70,10 @@ bool ChargerQueue::handleEvent(long currentTime) {
 long ChargerQueue::countPlanes() {
     return chargers.size() + planesWaiting.size();
 }
+const std::string ChargerQueue::describe() {
+    std::string description = "Charger Queue with " + std::to_string(chargers.size()) + " planes on chargers and " + std::to_string(planesWaiting.size()) + " planes waiting";
+    return description;
+}
 bool ChargerQueue::isEmpty() {
     return planesWaiting.empty() && chargers.empty();
 }
@@ -60,7 +89,7 @@ void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
         while(chargerPtr != end(chargers) &&  chargerPtr->timeDone > timeToCharged) {
             chargerPtr++;
         }
-        chargers.insert(chargerPtr, Charger(timeToCharged, aPlane));
+        chargers.insert(chargerPtr, Charger(currentTime, timeToCharged, aPlane));
         
         // if our earliest charger done time has changed, we need to be resorted in the SimClock
         if(nextEventTime != chargers.back().timeDone) {
@@ -145,7 +174,7 @@ bool testChargerQueueLong() {
         currentTime = aQueue.getNextEventTime();
         std::cout << std::endl;
         std::cout << "After handling event at time " << currentTime << std::endl;
-        aQueue.handleEvent(currentTime);
+        aQueue.handleEvent(currentTime, false);
         aQueue.describeQueues(currentTime);
     }
     

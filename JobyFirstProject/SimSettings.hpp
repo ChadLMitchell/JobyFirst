@@ -23,6 +23,10 @@ struct SimSettings {
     long simulationDuration = 60*60*3; // default 3 hours
     
     long chargerCount = 3;
+    
+    long planeCount = 20;
+    
+    long minPlanePerKind = 1;
 };
 
 #endif /* SimSettings_hpp */

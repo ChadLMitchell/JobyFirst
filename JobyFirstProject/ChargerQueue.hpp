@@ -13,6 +13,7 @@
 #include "Plane.hpp"
 
 struct Charger {
+    long timeStarted;
     long timeDone;
     std::shared_ptr<Plane> thePlane;
 };
@@ -30,8 +31,9 @@ class ChargerQueue: public EventHandler {
 public:
     ChargerQueue(Simulation *theSimulation, long chargerCount);
     virtual ~ChargerQueue() override;
-    virtual bool handleEvent(long currentTime) override;
+    virtual bool handleEvent(long currentTime, bool closeOut) override;
     virtual long countPlanes() override;
+    virtual const std::string describe() override;
     bool isEmpty();
     void addPlane(long currentTime, std::shared_ptr<Plane> aPlane);
     void setVerboseTesting(bool newValue);

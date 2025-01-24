@@ -23,17 +23,10 @@ class Flight: public EventHandler {
 public:
     Flight(Simulation *theSimulation, long startTime, long passengerCount, std::shared_ptr<Plane> aPlane);
     virtual ~Flight() override;
-    virtual bool handleEvent(long currentTime) override;
+    virtual bool handleEvent(long currentTime, bool closeOut) override;
     virtual long countPlanes() override;
+    virtual const std::string describe() override;
     void recordFlight();
 };
-
-struct FlightStats {
-    Company theCompany;
-    long duration;
-    long passengerCount;
-    long faultCount;
-};
-extern std::vector<FlightStats> completedFlights;
 
 #endif /* Flight_hpp */

@@ -62,10 +62,13 @@ public:
     // one PlaneQueue object in the SimClock. If there are no planes
     // in the queue we will set nextEventTime to LONG_MAX so we are never asked to do an
     // event (until something changes).
-    virtual bool handleEvent(long currentTime) override;
+    virtual bool handleEvent(long currentTime, bool closeOut) override;
 
     // For testing: count how may planes are in this "queue"
     virtual long countPlanes() override;
+
+    // For testing: describe this object in the clock handler queue
+    virtual const std::string describe() override;
 
     // Is the vector of Plane objects empty?
     bool isEmpty();

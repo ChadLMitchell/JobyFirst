@@ -43,6 +43,7 @@ void MenuGroup::runMenu() {
         for (auto item : theMenus) {
             item.printItem();
         }
+        cout << "> " << flush; // output a prompt
         char inChar;
         cin >> inChar;
         cin.ignore();

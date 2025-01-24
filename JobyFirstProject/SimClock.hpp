@@ -10,20 +10,9 @@
 
 #include <stdio.h>
 #include <iostream>
+#include "EventHandler.hpp"
 #include "Simulation.hpp"
 
-class EventHandler {
-protected:
-    long nextEventTime;
-public:
-    EventHandler();
-    EventHandler(long nextEventTime);
-    virtual ~EventHandler();
-    long getNextEventTime();
-    void setNextEventTime(long aTime);
-    virtual bool handleEvent(long currentTime);
-    virtual long countPlanes();
-};
 class SimClock {
     Simulation *theSimulation;
     long endTime;
@@ -39,7 +28,8 @@ public:
     void addHandler(std::shared_ptr<EventHandler> aHandler);
     void reSortHandler(std::shared_ptr<EventHandler> aHandler);
     void markNeedSort();
-    bool run();
+    bool checkSort(); // for testing
+    bool run(bool verbose);
     long countPlanes();
 };
 

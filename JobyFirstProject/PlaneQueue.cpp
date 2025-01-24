@@ -14,9 +14,14 @@ theSimulation{theSimulation}, verboseTesting{}, planesWaiting{} {
 }
 PlaneQueue::~PlaneQueue() {
 }
-bool PlaneQueue::handleEvent(long currentTime) {
+bool PlaneQueue::handleEvent(long currentTime, bool closeOut) {
+    if(closeOut) {
+        return false;
+    }
     if(planesWaiting.empty()) {
         std::cout << "PlaneQueue::handleEvent should not be called with no planess in use" <<  std::endl;
+        std::cout << "  Curent time: " << currentTime << std::endl;
+        std::cout << "  Next Event time: " << nextEventTime << std::endl;
         return false;
     }
     while(!planesWaiting.empty() && planesWaiting.back().nextFlightTime <= currentTime) {
@@ -25,7 +30,7 @@ bool PlaneQueue::handleEvent(long currentTime) {
         if(theSimulation && theSimulation->theSimClock) {
             theSimulation->theSimClock->addHandler(std::make_shared<Flight>(
                                          theSimulation,
-              currentTime + thePlane->calcTimeOnFullCharge__seconds(), Passenger::getPassengerCount(thePlane->getMaxPassengerCount(),theSimulation->theSettings),thePlane));
+              currentTime, Passenger::getPassengerCount(thePlane->getMaxPassengerCount(),theSimulation->theSettings),thePlane));
         } else if(verboseTesting) {
             std::cout << "Would add flight for " << thePlane->describe() << "to SimClock if full simulation" << std::endl;
         }
@@ -39,6 +44,10 @@ bool PlaneQueue::handleEvent(long currentTime) {
 }
 long PlaneQueue::countPlanes() {
     return planesWaiting.size();
+}
+const std::string PlaneQueue::describe() {
+    std::string description = "Plane Queue containing " + std::to_string(countPlanes()) + " planes";
+    return description;
 }
 bool PlaneQueue::isEmpty() {
     return planesWaiting.empty();
@@ -60,7 +69,14 @@ void PlaneQueue::addPlane(long delayUntil, std::shared_ptr<Plane> aPlane) {
 
 }
 void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachKind) {
-//    xxx
+// TO DO: create planes with constraints on minOfEachKind
+// TO DO: use settings to select value for delayUntil
+    // ********************************************************
+    
+    for(long i = 0; i < count; i++) {
+        addPlane(0, Plane::getRandomPlane());
+    }
+
 }
 std::shared_ptr<Plane> PlaneQueue::removeNextPlane() {
     if(planesWaiting.empty()) {
@@ -120,7 +136,7 @@ bool testPlaneQueueLong() {
         currentTime = aQueue.getNextEventTime();
         std::cout << std::endl;
         std::cout << "After handling event at time " << currentTime << std::endl;
-        aQueue.handleEvent(currentTime);
+        aQueue.handleEvent(currentTime, false);
         aQueue.describeQueue(currentTime);
     }
     

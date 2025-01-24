@@ -16,6 +16,7 @@ const char *companyNames[]{
     "Delta Company",
     "Echo Company"
 };
+
 // Show company name with error checking
 const char *companyName(Company c) {
     if(c < minCompany || c > maxCompany) {
@@ -64,6 +65,9 @@ const std::string Plane::describe(){
     std::string description = "plane #" + std::to_string(planeNumber) + " from " + getCompanyName();
     return description;
 }
+long Plane::getMilesPerHour() {
+    return mySpecs.cruise_speed__mph;
+}
 long Plane::calcTimeToCharge__seconds() {
     return mySpecs.time_to_charge__hours * 60 * 60;
 }
@@ -79,7 +83,7 @@ double Plane::calcMeanTimeBetweenFaults() {
 long Plane::getNextFaultInterval() {
     return nextFaultInterval;
 }
-long Plane::decrementNextFaultLinterval(long seconds) {
+long Plane::decrementNextFaultInterval(long seconds) {
     nextFaultInterval -= seconds;
     return seconds;
 }
@@ -88,9 +92,11 @@ long Plane::createFaultInterval() {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> distrib(0, 1);
     double random0to1 = distrib(gen);
-    if (random0to1 == 0) { random0to1 = 0.1; }; // avoid log 0
-    if (random0to1 == 1) { random0to1 = 0.9; }; // avoid log 1
+    if (random0to1 == 0.0) { random0to1 = 0.001; }; // avoid log 0
     nextFaultInterval = -std::log(random0to1) * 360 / mySpecs.probability_fault__per_hour;
+    if(nextFaultInterval <= 0) { // Truncating to integer value may result in 0 if interval is very small,
+        nextFaultInterval = 1;   // so make sure the result is at least 1.
+    }
     return nextFaultInterval;
 }
 long Plane::getMaxPassengerCount() {
@@ -125,7 +131,8 @@ bool Plane::validateSpecs(PlaneSpecification &spec) {
     return returnValue;
 }
 std::shared_ptr<Plane> Plane::getRandomPlane() {
-    return std::make_shared<Plane>(planeSpecifications[0]);
+    Company randCompany = allCompany[rand() % (maxCompany + 1)];
+    return std::make_shared<Plane>(planeSpecifications[randCompany]);
 }
 
 const double allowedPercentDiffFromMTBF{3.0};
