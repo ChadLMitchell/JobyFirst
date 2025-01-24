@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <vector>
+#include <queue>
 #include <string>
 #include "SimClock.hpp"
 #include "Plane.hpp"

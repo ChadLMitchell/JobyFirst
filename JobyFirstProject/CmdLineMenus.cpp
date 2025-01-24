@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <string>
 #include "CmdLineMenus.hpp"
 using namespace std;

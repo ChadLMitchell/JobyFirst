@@ -11,6 +11,7 @@
 #include "PlaneQueue.hpp"
 #include "SimSettings.hpp"
 #include <iomanip>
+#include <chrono>
 
 Simulation::Simulation(SimSettings someSettings):
 theSimClock{}, theChargerQueue{}, theFlightStats{}, theChargerStats{} {

@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <vector>
+#include <queue>
 #include <string>
 #include <iostream>
 #include "SimSettings.hpp"

@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <string>
 #include <iomanip>
 #include "DebugHelp.hpp"
