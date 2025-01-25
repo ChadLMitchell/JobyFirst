@@ -50,7 +50,7 @@ void MenuGroup::runMenu() {
         char inChar;
         cin >> inChar;
         cin.ignore();
-        auto chosenMenu = find_if(begin(theMenus), end(theMenus), [inChar](auto item){return item.isSelected(inChar);});
+        auto chosenMenu = find_if(begin(theMenus), end(theMenus), [inChar](MenuItem item){return item.isSelected(inChar);});
         if(chosenMenu != end(theMenus)) {
             if (chosenMenu->runFunction(*this)) {
                 return; // return to the higher level menu or exit the menu system

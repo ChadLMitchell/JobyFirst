@@ -42,12 +42,12 @@ void SimClock::markNeedSort()
     needSort = true;
 }
 bool SimClock::checkSort() {
-    return is_sorted(begin(eventHandlers), end (eventHandlers), [](auto lhs, auto rhs) {
+    return is_sorted(begin(eventHandlers), end (eventHandlers), [](std::shared_ptr<EventHandler> lhs, std::shared_ptr<EventHandler> rhs) {
         return lhs->getNextEventTime() > rhs->getNextEventTime();
     });
 }
 void SimClock::sortHandlers() {
-    sort(begin(eventHandlers), end (eventHandlers), [](auto lhs, auto rhs) {
+    sort(begin(eventHandlers), end (eventHandlers), [](std::shared_ptr<EventHandler> lhs, std::shared_ptr<EventHandler> rhs) {
         return lhs->getNextEventTime() > rhs->getNextEventTime();
     });
 }
