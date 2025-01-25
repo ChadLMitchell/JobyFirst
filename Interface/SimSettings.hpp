@@ -14,11 +14,10 @@
 #include <string>
 
 // These are used to help us convert from hours and minutes to seconds
-const long secondsPerHour{60 * 60}; // Converting seconds to hours and hours to seconds
-const double secondsPerHourD{60.0 * 60.0}; // For floating point calcuations
+const long secondsPerMinute{60}; // Converting seconds to minutes and minutes to seconds
+const long secondsPerHour{secondsPerMinute * 60}; // Converting seconds to hours and hours to seconds
+const double secondsPerHourD{secondsPerMinute * 60.0}; // For floating point calcuations
 const long defaultTestClockSeconds{secondsPerHour * 3}; //3 hours
-const long longTestClockSeconds{secondsPerHour * 30}; //30 hours
-const long shortTestClockSeconds{60}; //1 minute
 
 /*
  *******************************************************************************************

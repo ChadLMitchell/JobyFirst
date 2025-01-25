@@ -33,10 +33,10 @@ long Passenger::getPassengerCount(long maxPassengers,  std::shared_ptr<SimSettin
 // then each time a plane is put in PlaneQueue it is given a delay for passengers arriving
 // in the range [0 - maxPassengerDelay]. Planes that are grounded are also put into
 // PlaneQueue, but are given a dealy of LONG_MAX so they never are assigned to a flight.
-long Passenger::getPassengerDelay(std::shared_ptr<SimSettings> theSettings) {
-    if(theSettings == nullptr || theSettings->maxPassengerDelay <= 0) {
+long Passenger::getPassengerDelay(long maxPassengerDelay) {
+    if(maxPassengerDelay <= 0) {
         return 0;
     }
-    std::uniform_int_distribution<> delayDistribution(0, static_cast<int>(theSettings->maxPassengerDelay));
+    std::uniform_int_distribution<> delayDistribution(0, static_cast<int>(maxPassengerDelay));
     return delayDistribution(generator);
 }

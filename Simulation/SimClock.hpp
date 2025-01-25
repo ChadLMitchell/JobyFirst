@@ -71,6 +71,6 @@ public:
 };
 
 // Test the class to validate some functionality
-bool testSimClock(long howLongSeconds);
+bool testSimClock(bool longTest);
 
 #endif /* SimClock_hpp */

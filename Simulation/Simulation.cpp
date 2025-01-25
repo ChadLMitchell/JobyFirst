@@ -26,7 +26,7 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     theSimClock = std::make_shared<SimClock>(this, theSettings->simulationDuration);
     theChargerQueue = std::make_shared<ChargerQueue>(this, theSettings->chargerCount);
     thePlaneQueue = std::make_shared<PlaneQueue>(this);
-    thePlaneQueue->generatePlanes(theSimClock->getTime(), theSettings->planeCount, theSettings->minPlanePerKind);
+    thePlaneQueue->generatePlanes(theSimClock->getTime(), theSettings->planeCount, theSettings->minPlanePerKind, theSettings->maxPassengerDelay);
     theSimClock->addHandler(theChargerQueue);
     theSimClock->addHandler(thePlaneQueue);
     theSimClock->run(verbose);

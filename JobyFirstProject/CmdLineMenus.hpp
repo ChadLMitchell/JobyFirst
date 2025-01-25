@@ -43,4 +43,7 @@ public:
     virtual bool runSpecial(); // placeholder for children
 };
 
+const char menuSeparator{'-'}; // for a row of ---- in a menu
+const char menuIgnore{' '}; // for a menu item that cannot be selected
+
 #endif /* CmdLineMenus_hpp */

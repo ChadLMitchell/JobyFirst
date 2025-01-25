@@ -89,7 +89,7 @@ public:
     // which will be immediately if the option is no passenger delays.
     // If count >= minOfEachCompany and count >= "the number of plane Companys" there will
     // at least be minOfEachCompany planes of each Company.
-    void generatePlanes(long currentTime, long count, long minOfEachCompany);
+    void generatePlanes(long currentTime, long count, long minOfEachCompany, long maxPassengerDelay);
  
     // For testing: remove the next Plane from the vector independent of timing
     // and return it to the caller.
@@ -106,9 +106,9 @@ public:
 };
 
 // Test the class with verbose output that can be manually reviewed
-bool testPlaneQueueLong();
+bool testPlaneQueueWaits();
 
 // Test the class with minimal output, eventully TO DO would do automated test evaluation
-bool testPlaneQueueRandomMinimum();
+bool testPlaneQueueMinimumPerKind();
 
 #endif /* PlaneQueue_hpp */

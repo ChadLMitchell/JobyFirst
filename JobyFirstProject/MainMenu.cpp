@@ -100,13 +100,13 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     // temporary and do not affect future simulations
     SimSettings runSettings = currentSettings;
     if(selector == 2) {
-        runSettings.simulationDuration = longTestClockSeconds; // 30 hours
+        runSettings.simulationDuration = secondsPerHour * 30; // 30 hours
     } else if(selector == 3) {
-        runSettings.simulationDuration = longTestClockSeconds * 10; // 300 hours
+        runSettings.simulationDuration = secondsPerHour * 300; // 300 hours
     } else if(selector == 4) {
-        runSettings.simulationDuration = longTestClockSeconds * 100; // 3000 hours
+        runSettings.simulationDuration = secondsPerHour * 3000; // 3000 hours
     } else if(selector == 5) {
-        runSettings.simulationDuration = longTestClockSeconds * 1000; // 30,000 hours
+        runSettings.simulationDuration = secondsPerHour * 35040; // 35040 hours
 // This option works on Mac, but it would require all times to be long long on Windows
 //    } else if(selector == 6) {
 //        runSettings.simulationDuration = longTestClockSeconds * 10000; // 300,000 hours
@@ -190,17 +190,20 @@ bool doQuit(int selector, MenuGroup &thisMenuGroup) {
 }
 
 vector<MenuItem> mainMenus {
+    MenuItem('E', string{"Edit Settings"}, &editSettings, 0),
+    MenuItem('R', string{"Run Simulation with Current Settings"}, &runSimulation, 0),
+    MenuItem('A', string{"Average results from 100 Simulations"}, &runMultiple, 0),
+    MenuItem('V', string{"Run Simulation Verbose with Current Settings"}, &runSimulation, 1),
     MenuItem('T', string{"Run Tests"}, &runTests, 0),
-    MenuItem('S', string{"Edit Settings"}, &editSettings, 0),
-    MenuItem('R', string{"Run Default Duration Simulation"}, &runSimulation, 0),
-    MenuItem('M', string{"Average results from 100 Default Simulations"}, &runMultiple, 0),
-    MenuItem('V', string{"Run Default Duration Simulation Verbose"}, &runSimulation, 1),
-    MenuItem('2', string{"Run 30-hour Simulation)"}, &runSimulation, 2),
-    MenuItem('3', string{"Run 300-hour (12.5 Day) Simulation"}, &runSimulation, 3),
-    MenuItem('4', string{"Run 3000-hour (125 Day) Simulation"}, &runSimulation, 4),
-    MenuItem('5', string{"Run 30,000-hour (1250 Day) Simulation"}, &runSimulation, 5),
-// This option works on Mac, but it would require all times to be long long on Windows
-//    MenuItem('6', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
+    MenuItem('-', string{""}, nullptr, 0),
+    MenuItem(' ', string{"Stress Test Options:"}, nullptr, 0),
+    MenuItem('1', string{"Run 30-hour Simulation)"}, &runSimulation, 2),
+    MenuItem('2', string{"Run 300-hour (12.5 Day) Simulation"}, &runSimulation, 3),
+    MenuItem('3', string{"Run 3,000-hour (125 Day) Simulation"}, &runSimulation, 4),
+    MenuItem('4', string{"Run 35,040-hour (4 year) Simulation"}, &runSimulation, 5),
+// This option works on Mac, but it would require all time variablese to be long long on Windows
+//    MenuItem('5', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
+    MenuItem('-', string{""}, nullptr, 0),
     MenuItem('Q', string{"Quit"}, &doQuit, 0)
 };
 MenuGroup mainMenu = MenuGroup(mainMenus);

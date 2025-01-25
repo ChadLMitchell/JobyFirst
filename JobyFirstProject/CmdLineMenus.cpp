@@ -29,13 +29,22 @@ bool MenuItem::isSelected(char aChar) { // does the character match the selector
 }
 bool MenuItem::runFunction(MenuGroup &thisMenuGroup)  {
     // run the function stored in the menu item
-    return funcPtr(selector, thisMenuGroup);
+    if(funcPtr) {
+        return funcPtr(selector, thisMenuGroup);
+    }
+    return true;
 }
 int MenuItem::getSelector() { // does the character match the selector for this item?
     return selector;
 }
 void MenuItem::printItem() { // print the menu item
-    cout << "  " << menuSelect << ": " << menuText << endl;
+    if(menuSelect == menuSeparator) {
+        cout << "---------------------------------" << endl;
+    } else if(menuSelect == menuIgnore) {
+        cout  << menuText << endl;
+    } else {
+        cout << "  " << menuSelect << ": " << menuText << endl;
+    }
 }
 
 MenuGroup::MenuGroup(vector<MenuItem> &someMenus): theMenus(someMenus) {
@@ -51,7 +60,7 @@ void MenuGroup::runMenu() {
         cin >> inChar;
         cin.ignore();
         auto chosenMenu = find_if(begin(theMenus), end(theMenus), [inChar](MenuItem item){return item.isSelected(inChar);});
-        if(chosenMenu != end(theMenus)) {
+        if(inChar != menuSeparator && inChar != menuIgnore && chosenMenu != end(theMenus)) {
             if (chosenMenu->runFunction(*this)) {
                 return; // return to the higher level menu or exit the menu system
             }

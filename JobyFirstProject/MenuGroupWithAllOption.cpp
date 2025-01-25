@@ -20,10 +20,10 @@ MenuGroupWithAllOption::~MenuGroupWithAllOption() {
 bool MenuGroupWithAllOption::runSpecial() {
     for (auto item : theMenus) {
         int selector = item.getSelector();
-        if(selector != 0) {
-            if (item.runFunction(*this)) {
-                return true; // return to the higher level menu or exit the menu system
-            }
+        if(selector == 0) {
+            return false; // we are done
+        } else if (item.runFunction(*this)) {
+            return true; // return to the higher level menu or exit the menu system
         }
     }
     return false;

@@ -38,7 +38,7 @@ public:
 
     // This determines how long a delay there will be for a particular flight.
     // Depending on the settings it may return 0 delay or some randome delay
-    static long getPassengerDelay(std::shared_ptr<SimSettings> theSettings);
+    static long getPassengerDelay(long maxPassengerDelay);
 };
 
 #endif /* Passenger_hpp */

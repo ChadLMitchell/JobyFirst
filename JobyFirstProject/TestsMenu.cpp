@@ -29,22 +29,25 @@ bool testPlaneClass(int selector) {
     } else {
         cout << "Test of Plane Class failed" << endl;
     }
+    std::cout << std::endl;
     return false;
 }
 bool shortTestSimClockClass(int selector) {
-    if(testSimClock(shortTestClockSeconds)) {
-        cout << "Test of SimClock Class passed" << endl;
+    if(testSimClock(false)) {
+        cout << "Short Test of SimClock Class passed" << endl;
     } else {
-        cout << "Test of SimClock Class failed" << endl;
+        cout << "Short Test of SimClock Class failed" << endl;
     }
+    std::cout << std::endl;
     return false;
 }
 bool longTestSimClockClass(int selector) {
-    if(testSimClock(defaultTestClockSeconds)) {
-        cout << "Test of SimClock Class passed" << endl;
+    if(testSimClock(true)) {
+        cout << "Short Test of SimClock Class passed" << endl;
     } else {
-        cout << "Test of SimClock Class failed" << endl;
+        cout << "Short Test of SimClock Class failed" << endl;
     }
+    std::cout << std::endl;
     return false;
 }
 bool shortTestChargerQueue(int selector) {
@@ -55,12 +58,12 @@ bool longTestChargerQueue(int selector) {
     testChargerQueueLong();
     return false;
 }
-bool shortTestPlaneQueue(int selector) {
-    testPlaneQueueRandomMinimum();
+bool testPlaneQueueWaits(int selector) {
+    testPlaneQueueWaits();
     return false;
 }
-bool longTestPlaneQueue(int selector) {
-    testPlaneQueueLong();
+bool testPlaneQueueMinimumPerKind(int selector) {
+    testPlaneQueueMinimumPerKind();
     return false;
 }
 
@@ -73,11 +76,11 @@ bool test(int selector) {
 vector<TestFuncPtr> tests {
     testPlaneClass, // test 1
     shortTestSimClockClass, // test 2
-    longTestSimClockClass, // test 3
-    shortTestChargerQueue, // test 4
-    longTestPlaneQueue,  // test 5
-    shortTestPlaneQueue, // test 6
-    longTestChargerQueue  // test 7
+    shortTestChargerQueue, // test 3
+    longTestChargerQueue,  // test 4
+    testPlaneQueueWaits,  // test 5
+    testPlaneQueueMinimumPerKind, // test 6
+    longTestSimClockClass // test 7
 };
 
 bool runTest(int selector, MenuGroup &thisMenuGroup) {
@@ -89,6 +92,7 @@ bool runTest(int selector, MenuGroup &thisMenuGroup) {
     }
 }
 bool runAllTests(int selector, MenuGroup &thisMenuGroup) {
+    debugMessage("===> Selected Run All Above Tests");
     thisMenuGroup.runSpecial();
     return false;
 }
@@ -100,12 +104,13 @@ bool doMainMenu(int selector, MenuGroup &thisMenuGroup) {
 vector<MenuItem> testMenus {
     MenuItem('1', string{"Test Plane Class"}, &runTest, 1),
     MenuItem('2', string{"Short Test Sim Clock"}, &runTest, 2),
-    MenuItem('3', string{"Long Test Sim Clock"}, &runTest, 3),
-    MenuItem('4', string{"Short Test ChargerQueue"}, &runTest, 4),
-    MenuItem('5', string{"Long Test ChargerQueue"}, &runTest, 5),
-    MenuItem('6', string{"Short Test PlaneQueue"}, &runTest, 6),
-    MenuItem('7', string{"Long Test PlaneQueue"}, &runTest, 7),
-    MenuItem('A', string{"Run All Tests"}, &runAllTests, 0),
+    MenuItem('3', string{"Short Test ChargerQueue"}, &runTest, 3),
+    MenuItem('4', string{"Long Test ChargerQueue"}, &runTest, 4),
+    MenuItem('5', string{"Test PlaneQueue: Waits for Passengers"}, &runTest, 5),
+    MenuItem('6', string{"Test PlaneQueue: Minimum per Kind"}, &runTest, 6),
+    MenuItem('-', string{""}, nullptr, 0),
+    MenuItem('A', string{"Run All Above Tests"}, &runAllTests, 0),
+    MenuItem('L', string{"Long Test Sim Clock"}, &runTest, 7),
     MenuItem('M', string{"Return to Main Menu"}, &doMainMenu, 0)
 };
 MenuGroupWithAllOption testMenu = MenuGroupWithAllOption(testMenus);

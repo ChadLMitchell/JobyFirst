@@ -76,6 +76,7 @@ bool SimClock::run(bool verbose) {
         // Process this eventHandler
         eventHandlers.pop_back();
         if(nextTime > currentTime && verbose) {
+            std::cout << std::endl;
             std::cout << "Advancing time to " << nextTime << std::endl;
         }
         currentTime = nextTime;
@@ -125,11 +126,12 @@ long SimClock::countPlanes() {
 
 const int maxRangeDelay{20};
 const int maxTestHandlerRepeat{20};
-const int testHandlerCount{100};
+const int longTestHandlerCount{25};
+const int shortTestHandlerCount{5};
 
 std::random_device rdTestHandler;
 std::mt19937 genTestHandler(rdTestHandler());
-std::uniform_int_distribution<> distribTestHandlerDelay(1, maxRangeDelay);
+std::uniform_int_distribution<> distribTestHandlerDelay(2, maxRangeDelay);
 std::uniform_int_distribution<> distribTestHandlerRepeat(1, maxTestHandlerRepeat);
 
 class TestHandler: public EventHandler {
@@ -160,12 +162,15 @@ public:
     }
 };
 
-bool testSimClock(long howLongSeconds) {
-    std::cout << "Test Sim Clock" << std::endl;
-    SimClock aClock(nullptr, howLongSeconds);
+bool testSimClock(bool longTest) {
+    std::cout << "***** Starting Test of SimClock Class *****" << std::endl;
+    SimClock aClock(nullptr, longTest ? defaultTestClockSeconds : secondsPerMinute);
+    int testHandlerCount = longTest ? longTestHandlerCount : shortTestHandlerCount;
     for(int i=0; i<testHandlerCount; i++) {
-        aClock.addHandler(std::make_shared<TestHandler>(distribTestHandlerDelay(genTestHandler), distribTestHandlerRepeat(genTestHandler),i + 1));
+        aClock.addHandler(std::make_shared<TestHandler>(distribTestHandlerDelay(genTestHandler),
+                                                        distribTestHandlerRepeat(genTestHandler),i + 1));
     }
-    
-    return aClock.run(true);
+    bool returnValue = aClock.run(true);
+    std::cout << std::endl;
+    return returnValue;
 }

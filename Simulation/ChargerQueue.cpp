@@ -49,7 +49,9 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
 
         chargers.pop_back();
         if(theSimulation && theSimulation->thePlaneQueue) {
-            theSimulation->thePlaneQueue->addPlane(currentTime + Passenger::getPassengerDelay(theSimulation->theSettings),thePlane);
+            long maxPassengerDelay = 0;
+            if(theSimulation->theSettings) { maxPassengerDelay = theSimulation->theSettings->maxPassengerDelay; }
+            theSimulation->thePlaneQueue->addPlane(currentTime + Passenger::getPassengerDelay(maxPassengerDelay),thePlane);
         } else if(verboseTesting) {
             std::cout << "Would add flight for " << thePlane->describe() << "to thePlaneQueue if Sim full simulation" << std::endl;
         }
@@ -114,7 +116,7 @@ void ChargerQueue::setVerboseTesting(bool newValue) {
     verboseTesting = newValue;
 }
 void ChargerQueue::describeQueues(long currentTime) {
-    std::cout << "*** ChargerQueue Status" << std::endl;
+    std::cout << "<<< ChargerQueue Status >>>" << std::endl;
     std::cout << "Current Time: " << currentTime << std::endl;
     if(chargers.size() == 0) {
         std::cout << "No planes on a charger" << std::endl;
@@ -176,7 +178,7 @@ bool testChargerQueueLong() {
     bool returnValue = true;
     long currentTime = 0;
     ChargerQueue aQueue(nullptr, testChargers);
-    std::cout << "Starting long test of ChargerQueue" << std::endl;
+    std::cout << " ***** Starting long test of ChargerQueue Class  *****" << std::endl;
     for(auto i=0; i<testPlanes; i++){
         std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
         std::cout << "Adding " << aPlane->describe() << std::endl;
@@ -185,12 +187,12 @@ bool testChargerQueueLong() {
     aQueue.describeQueues(currentTime);
     while(!aQueue.isEmpty()) {
         currentTime = aQueue.getNextEventTime();
-        std::cout << std::endl;
         std::cout << "After handling event at time " << currentTime << std::endl;
         aQueue.handleEvent(currentTime, false);
         aQueue.describeQueues(currentTime);
     }
-    
+    std::cout << "Long test of ChargerQueue Class completed" << std::endl;
+    std::cout << std::endl;
     return returnValue;
 }
 bool testChargerQueueShort() {
@@ -201,7 +203,7 @@ bool testChargerQueueShort() {
     long currentTime = 0;
     ChargerQueue aQueue(nullptr, testChargers);
     aQueue.setVerboseTesting(true);
-    std::cout << "Starting short test of ChargerQueue" << std::endl;
+    std::cout << " ***** Starting short test of ChargerQueue Class  *****" << std::endl;
     for(auto i=0; i<testPlanes; i++){
         std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
         aQueue.addPlane(currentTime, aPlane);
@@ -220,6 +222,7 @@ bool testChargerQueueShort() {
         std::cout << "    Plane #" << statusItem.planeNum << std::endl;
 
     }
-    
+    std::cout << "Short test of ChargerQueue Class completed" << std::endl;
+    std::cout << std::endl;
     return returnValue;
 }

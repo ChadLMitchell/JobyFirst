@@ -141,7 +141,7 @@ bool testPlaneClassObjects(bool verbose) {
     bool returnValue = true;
     const double tries = 10000;
     if(verbose) {
-        std::cout << "Testing Plane Class" << std::endl;
+        std::cout << " ***** Starting Test of Plane Class  *****" << std::endl;
         std::cout << "Validating specificastions and simulation of time to next fault" << std::endl;
     }
     for(PlaneSpecification aSpec: planeSpecifications) {
