@@ -15,7 +15,6 @@
 #include "DebugHelp.hpp"
 #include "CmdLineMenus.hpp"
 #include "SimSettings.hpp"
-#include "Plane.hpp"
 
 using namespace std;
 
@@ -73,7 +72,11 @@ bool setMinimumPlaneOption(int selector, MenuGroup &thisMenuGroup) {
 
 // Get input from the user for the value for currentSettings.simulationDuration
 bool setDuration(int selector, MenuGroup &thisMenuGroup) {
-    currentSettings.maxPassengerDelay = getNumberFromUser("Input Simulation duration (in seconds): ");
+    if(selector == 4) {
+        currentSettings.simulationDuration = getNumberFromUser("Input Simulation duration (in seconds): ");
+    } else {
+        currentSettings.simulationDuration = getNumberFromUser("Input Simulation duration (in hours): ") * secondsPerHour;
+    }
     return false;
 }
 
@@ -123,10 +126,11 @@ vector<MenuItem> settingsMenus {
     MenuItem('1', string{"Set Charger Count"}, &setChargerCount, 1),
     MenuItem('2', string{"Set Plane Count"}, &setPlaneCount, 2),
     MenuItem('3', string{"Set Minimum Planes Per Kind Option"}, &setMinimumPlaneOption, 3),
-    MenuItem('4', string{"Change Simulation Duration"}, &setDuration, 4),
-    MenuItem('5', string{"Set Passenger Count Option"}, &setPassengerCountOption, 5),
-    MenuItem('6', string{"Set Passenger Delay Option"}, &setPassengerDelayOption, 6),
-    MenuItem('7', string{"Set Fault Option"}, &setFaultOption, 7),
+    MenuItem('4', string{"Change Simulation Duration (in Seconds)"}, &setDuration, 4),
+    MenuItem('5', string{"Change Simulation Duration (in Hours)"}, &setDuration, 5),
+    MenuItem('6', string{"Set Passenger Count Option"}, &setPassengerCountOption, 6),
+    MenuItem('7', string{"Set Passenger Delay Option"}, &setPassengerDelayOption, 7),
+    MenuItem('8', string{"Set Fault Option"}, &setFaultOption, 8),
     MenuItem('M', string{"Return to Main Menu"}, &returnToMainMenu, 0)
 };
 MenuGroup settingsMenu = MenuGroup(settingsMenus);

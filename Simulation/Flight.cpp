@@ -54,8 +54,8 @@ bool Flight::handleEvent(long currentTime, bool closeOut) {
     thePlane->decrementNextFaultInterval(endTime - startOfCurrentFaultInterval);
 
     recordFlight();
-    if(faultOption == 1 && faultCount > 0) {
-        // faultOption == 1 means we ground flight with faults afer the flight completes
+    if(faultOption == 2 && faultCount > 0) {
+        // faultOption == 2 means we ground flight with a fault afer the flight completes
         if(theSimulation && theSimulation->thePlaneQueue) {
             // We ground it by giving it an infinite delay
             theSimulation->thePlaneQueue->addPlane(LONG_MAX, thePlane);

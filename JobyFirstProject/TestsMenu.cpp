@@ -14,10 +14,10 @@
 #include "DebugHelp.hpp"
 #include "CmdLineMenus.hpp"
 #include "MenuGroupWithAllOption.hpp"
-#include "Plane.hpp"
 #include "SimClock.hpp"
 #include "ChargerQueue.hpp"
 #include "PlaneQueue.hpp"
+#include "Simulation.hpp"
 #include "SimSettings.hpp"
 using namespace std;
 

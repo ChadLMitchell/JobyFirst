@@ -114,17 +114,13 @@ void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachComp
         // Remember the choice
         companyChoices[planesAllocated] = allCompany[thisCompany];
     }
-    // Prefetch the maximum passenger delay
-    long maxDelay = 0;
-    if(theSimulation && theSimulation->theSettings && theSimulation->theSettings->maxPassengerDelay > 0) {
-        maxDelay = theSimulation->theSettings->maxPassengerDelay;
-    }
+
     // We do the actual allocation of planes as a separate step in case we want to add more processing first
     for(long thisChoice: companyChoices) {
         // set up this plane's wait for passengers
         long waitForPassengers = 0;
-        if(maxDelay > 0) {
-            waitForPassengers = rand() % maxDelay;
+        if(theSimulation) {
+            waitForPassengers = Passenger::getPassengerDelay(theSimulation->theSettings);
         }
         // actually add the random plane
         addPlane(waitForPassengers, std::make_shared<Plane>(planeSpecifications[thisChoice]));

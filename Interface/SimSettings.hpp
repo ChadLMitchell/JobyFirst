@@ -20,34 +20,62 @@ const long defaultTestClockSeconds{secondsPerHour * 3}; //3 hours
 const long longTestClockSeconds{secondsPerHour * 30}; //30 hours
 const long shortTestClockSeconds{60}; //1 minute
 
-// These are settings for the simulator. We can pass a copy of these into the Simulator
-// constructor to run with these. To use the defaults, create a SimSettings object with
-// the default values.
+/*
+ *******************************************************************************************
+ * Struct SimSettings
+ * These are settings for the simulator. We can pass a copy of these into the Simulator
+ * constructor to run with these. To use the defaults, create a SimSettings object with
+ * the default values. To run with modified settings, create a copy of this struct and
+ * modify it before passing it to a Simulator object.
+ *******************************************************************************************
+ */
 struct SimSettings {
     
+    // How long with this simulation run (in simulated seconds)?
+    long simulationDuration = defaultTestClockSeconds; // default 3 hours
+    
+    // How may chargers will we have for this simulation?
+    long chargerCount = 3;
+    
+    // How many planes will we have for this simulation?
+    long planeCount = 20;
+    
+    // When we "randomly" allocate planes, do we require a minimum number of each plane.
+    // If this is set to 0, we may sometimes have none of one or more kinds.
+    // If this is set to planeCount / companyCount (rounded down) then we will have an even or
+    // equal distribution of evey kind of planes, still randomly allocated. This can be set
+    // at any value [0 - planeCount / companyCount]
+    long minPlanePerKind = 1; // Default is 1 we always have statistics for all kinds of planes
+    
+    // Do we always fill the planes or are they sometimes parially filled?
     int passengerCountOption = 0;
     // 0 = plane always flies full
     // 1 = randomly distribute number of passengers between 1 and max for each flight
 
+    // How do we handle faults? Do we just count them or do they affect operations?
     int faultOption = 0;
     // 0 = just count faults
     // 1 = fault grounds plane immediately for duration of simulation
-    // 2 = fault grounds plane at the end of current flight
+    // 2 = fault grounds plane at the end of current flight for duration of simulation
 
+    //
     long maxPassengerDelay = 0;
-    // 0 = enough passengers are always available
-    // > 0 = randomly distribute delay between 0 and max for each flight
-
-    long simulationDuration = defaultTestClockSeconds; // default 3 hours
-    
-    long chargerCount = 3;
-    
-    long planeCount = 20;
-    
-    long minPlanePerKind = 1;
+    // 0 means passengers are always available when we have a plane ready
+    // > 0 means passengers may not be available when a plane is ready.
+    // In the later case, when a plane is ready it will wait a random
+    // amount of time from 0 to maxPassengerDelay until starting the next
+    // flight.
 };
 
-// enumeration of the possible company/kinds of planes
+/*
+ *******************************************************************************************
+ * Companies (types of planes)
+ * Later we could make these options as well, but for now they are hard wired into the
+ * simulation so we provide these constants to work with them. It is easy to change these
+ * here, but they are not currently ruser settable options like those above.
+ *******************************************************************************************
+ */
+// enumeration of the possible companies (kinds of planes)
 enum Company {
     Alpha = 0,
     Bravo,

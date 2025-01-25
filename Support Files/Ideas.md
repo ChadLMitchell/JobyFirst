@@ -4,12 +4,13 @@ Key TO DOs
 options?
 documentation
 
-Two more options
+Implement passengerCountOption
+Implement maxPassengerDelay
 
 This is to capture observations and ideas as they occur.
 
 Jan 17
-Received the assignment this evening, delayed due to a mail error from Joby HR.
+Received the assignment this evening, delayed due to a mail error from Joby.
 Asked confirmation of the C++ version currently used there.
 Also asked for clarification about the term "faults" to see if there is a standard meaning.
     Some options:
@@ -45,5 +46,12 @@ Assumptions
         All planes start in a queue of planes to fly next so they could have a delay, but for now assume the delay is 0.
     Seconds is fine enough ressolution for this simulation so the clock can do seconds allowing mostly integer arithmetic.
     
-Ran into a problem with ChargerQueue. The others are able to handle changes in the sorted Vector of eventHandlers, but if we add something to the Charger Queue, it may need to be resorted. Eventually we added an option to force a full resort of the eventHandlers. There cannot be more than the count of planes so it should not cost too much to resort.
+Ran into a problem with ChargerQueue. The others are able to handle changes in the sorted Vector of eventHandlers,
+but if we add something to the Charger Queue, it may need to be resorted. Eventually we added an option to force
+a full resort of the eventHandlers. There cannot be more than the count of planes so it should not cost too much to resort.
 
+On Jan 24 asked for clarification of average time charging. It seemed it could be
+    calculated up front with no need to simulate it.
+    A minor difference would be from partial charges when the simulation ends.
+    Tom clarified that it could also include the time spent waiting for a charger.
+    Decided to add that calculation and to list results with and without wait times.

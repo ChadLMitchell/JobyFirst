@@ -17,16 +17,31 @@
 #include "TestsMenu.hpp"
 #include "SettingsMenu.hpp"
 #include "MenuGroupWithAllOption.hpp"
-#include "Plane.hpp"
-#include "SimClock.hpp"
-#include "ChargerQueue.hpp"
-#include "PlaneQueue.hpp"
+#include "Simulation.hpp"
 #include "SimSettings.hpp"
 
 using namespace std;
 
 // Refer to the current settings to be used in creating simulations
 extern SimSettings currentSettings;
+
+void outputSettings(const SimSettings &s)
+{
+    cout << "Simulation Settings:" << endl;
+    cout << "Duration: " << s.simulationDuration << " seconds" << endl;
+    cout << "Using " << s.chargerCount << " chargers and "  << s.planeCount << " planes" << endl;
+    cout << "Minimum planes per kind: " << s.minPlanePerKind << endl;
+    cout << "Passenger Count Option: "
+    << (s.passengerCountOption == 0 ? "Planes always fly full" : "Passenger count random up to max") << endl;
+    cout << "Passenger Option: "
+    << (s.faultOption == 0 ? "Faults counted, but do not affect flights" : (s.faultOption == 01 ? "A fault grounds plane immediately" : "A fault grounds plane at end of current flight")) << endl;
+    string delayString = "No delay for passengers";
+    if(s.passengerCountOption > 0) {
+        delayString = "When ready to fly, planes experience a random [0 - " + to_string(s.passengerCountOption) + "] second delay for passengers";
+    }
+    cout << "Passenger Delay Option: " << delayString << endl;
+    cout << endl;
+}
 
 void outputResults(std::vector<FinalStats> results)
 {
@@ -99,7 +114,8 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
 
     Simulation aSimulation(runSettings);
     std::vector<FinalStats> results = aSimulation.run(selector == 1 ? true : false);
-    
+    outputSettings(runSettings);
+    cout << "Results for this simulation run:" << endl;
     outputResults(results);
 
     return false;
@@ -162,8 +178,8 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
         accumulatedStats[c].totalFaults /= runCount;
         accumulatedStats[c].totalPassengerMiles /= runCount;
     }
+    outputSettings(runSettings);
     cout << "Average results for " << runCount << " simulation runs:" << endl;
-    
     outputResults(accumulatedStats);
 
     return false;

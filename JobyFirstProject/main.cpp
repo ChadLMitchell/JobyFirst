@@ -15,10 +15,6 @@
 #include "TestsMenu.hpp"
 #include "MainMenu.hpp"
 #include "MenuGroupWithAllOption.hpp"
-#include "Plane.hpp"
-#include "SimClock.hpp"
-#include "ChargerQueue.hpp"
-#include "PlaneQueue.hpp"
 #include "SimSettings.hpp"
 
 SimSettings currentSettings;

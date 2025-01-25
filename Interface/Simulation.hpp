@@ -105,7 +105,7 @@ protected:
     std::shared_ptr<ChargerQueue> theChargerQueue;
     std::shared_ptr<PlaneQueue> thePlaneQueue;
     // When some of those three classes create any Flight objects, they forward the pointer
-    // to this Simulation so it can also access the procted members of this class.
+    // to this Simulation so it also needs access to the procted members of this class.
     friend class Flight;
 
     // Shared settings for this instance of the Simulation

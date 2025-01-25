@@ -13,7 +13,10 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include <random>
+
 #include "SimSettings.hpp"
+
 
 /*
  *******************************************************************************************
@@ -24,6 +27,9 @@
  */
 class Passenger {
     Passenger() = delete;
+
+    static std::random_device a_random_device;
+    static std::mt19937 generator;
 public:
     // This provides the number of passengers on a flight. It takes the maximum number
     // and the settings and determines if it should return that maximum number or a
