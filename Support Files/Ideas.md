@@ -4,28 +4,7 @@ Key TO DOs
 options?
 documentation
 
-Fix Errors:
-===> Selected Run Simulation
-Error in SimClock::run(): Out of order nextEventTime
-currentTime: 22200
-nextTime: 21931 forFlight for plane #plane #16 from Alpha Company endTime: 22800 nextFaultTime: 21931
-Error in SimClock::run(): Out of order nextEventTime
-currentTime: 35160
-nextTime: 34976 forFlight for plane #plane #12 from Alpha Company endTime: 35760 nextFaultTime: 34976
-Error in SimClock::run(): Out of order nextEventTime
-currentTime: 41640
-nextTime: 41165 forFlight for plane #plane #15 from Alpha Company endTime: 42240 nextFaultTime: 41165
-Error in SimClock::run(): Out of order nextEventTime
-currentTime: 71880
-nextTime: 71420 forFlight for plane #plane #11 from Alpha Company endTime: 72480 nextFaultTime: 71420
-Error in SimClock::run(): Out of order nextEventTime
-currentTime: 80520
-nextTime: 80478 forFlight for plane #plane #17 from Alpha Company endTime: 81120 nextFaultTime: 80478
-Time taken by simulation: 1842 microseconds
-
-
-
-
+Two more options
 
 This is to capture observations and ideas as they occur.
 

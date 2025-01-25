@@ -33,11 +33,11 @@ PlaneSpecification planeSpecifications[]{
 //    double energy_use__kWh_per_mile;
 //    long passenger_count;
 //    double probability_fault__per_hour;
-    PlaneSpecification(Company::Alpha, 120, 320, 0.6, 1.6, 4, 0.25),
-    PlaneSpecification(Company::Bravo, 100, 100, 0.2, 1.5, 5, 0.1),
-    PlaneSpecification(Company::Charlie, 160, 220, 0.8, 2.2, 3, 0.05),
-    PlaneSpecification(Company::Delta, 90, 120, 0.62, 0.8, 2, 0.22),
-    PlaneSpecification(Company::Echo, 30, 150, 0.3, 5.8, 2, 0.61)
+    PlaneSpecification{Company::Alpha, 120, 320, 0.6, 1.6, 4, 0.25},
+    PlaneSpecification{Company::Bravo, 100, 100, 0.2, 1.5, 5, 0.1},
+    PlaneSpecification{Company::Charlie, 160, 220, 0.8, 2.2, 3, 0.05},
+    PlaneSpecification{Company::Delta, 90, 120, 0.62, 0.8, 2, 0.22},
+    PlaneSpecification{Company::Echo, 30, 150, 0.3, 5.8, 2, 0.61}
 };
 
 int Plane::NextPlaneNumber = 1;
@@ -65,20 +65,20 @@ const std::string Plane::describe(){
     std::string description = "plane #" + std::to_string(planeNumber) + " from " + getCompanyName();
     return description;
 }
-long Plane::getMilesPerHour() {
+double Plane::getMilesPerHour() {
     return mySpecs.cruise_speed__mph;
 }
 long Plane::calcTimeToCharge__seconds() {
-    return mySpecs.time_to_charge__hours * 60 * 60;
+    return lround(mySpecs.time_to_charge__hours * secondsPerHourD);
 }
 double Plane::calcDistanceFullCharge__miles() {
     return mySpecs.battery_capacity__kWh / mySpecs.energy_use__kWh_per_mile;
 }
 long Plane::calcTimeOnFullCharge__seconds() {
-    return lround(calcDistanceFullCharge__miles()*360 / mySpecs.cruise_speed__mph);
+    return lround(calcDistanceFullCharge__miles()* secondsPerHourD / mySpecs.cruise_speed__mph);
 }
 double Plane::calcMeanTimeBetweenFaults() {
-    return 360/mySpecs.probability_fault__per_hour;
+    return secondsPerHourD/mySpecs.probability_fault__per_hour;
 }
 long Plane::getNextFaultInterval() {
     return nextFaultInterval;
@@ -92,8 +92,8 @@ long Plane::createFaultInterval() {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> distrib(0, 1);
     double random0to1 = distrib(gen);
-    if (random0to1 == 0.0) { random0to1 = 0.001; }; // avoid log 0
-    nextFaultInterval = -std::log(random0to1) * 360 / mySpecs.probability_fault__per_hour;
+    if (random0to1 < 0.001) { random0to1 = 0.001; }; // avoid log 0
+    nextFaultInterval = lround(-std::log(random0to1)* secondsPerHourD / mySpecs.probability_fault__per_hour);
     if(nextFaultInterval <= 0) { // Truncating to integer value may result in 0 if interval is very small,
         nextFaultInterval = 1;   // so make sure the result is at least 1.
     }

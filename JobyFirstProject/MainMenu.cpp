@@ -130,6 +130,7 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
             //      double averageDistancePerFlight;
             //      long totalCharges;
             //      double averageTimeCharging;
+            //      double averageTimeChargingWithWait;
             //      long totalFaults;
             //      long totalPassengerMiles;
             accumulatedStats[c].totalFlights += results[c].totalFlights;
@@ -137,6 +138,7 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
             accumulatedStats[c].averageDistancePerFlight += results[c].averageDistancePerFlight;
             accumulatedStats[c].totalCharges += results[c].totalCharges;
             accumulatedStats[c].averageTimeCharging += results[c].averageTimeCharging;
+            accumulatedStats[c].averageTimeChargingWithWait += results[c].averageTimeChargingWithWait;
             accumulatedStats[c].totalFaults += results[c].totalFaults;
             accumulatedStats[c].totalPassengerMiles += results[c].totalPassengerMiles;
         }
@@ -156,6 +158,7 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
         accumulatedStats[c].averageDistancePerFlight /= runCount;
         accumulatedStats[c].totalCharges /= runCount;
         accumulatedStats[c].averageTimeCharging /= runCount;
+        accumulatedStats[c].averageTimeChargingWithWait /= runCount;
         accumulatedStats[c].totalFaults /= runCount;
         accumulatedStats[c].totalPassengerMiles /= runCount;
     }
@@ -174,6 +177,7 @@ vector<MenuItem> mainMenus {
     MenuItem('T', string{"Run Tests"}, &runTests, 0),
     MenuItem('S', string{"Edit Settings"}, &editSettings, 0),
     MenuItem('R', string{"Run Default Duration Simulation"}, &runSimulation, 0),
+    MenuItem('M', string{"Average results from 100 Default Simulations"}, &runMultiple, 0),
     MenuItem('V', string{"Run Default Duration Simulation Verbose"}, &runSimulation, 1),
     MenuItem('2', string{"Run 30-hour Simulation)"}, &runSimulation, 2),
     MenuItem('3', string{"Run 300-hour (12.5 Day) Simulation"}, &runSimulation, 3),
@@ -181,7 +185,6 @@ vector<MenuItem> mainMenus {
     MenuItem('5', string{"Run 30,000-hour (1250 Day) Simulation"}, &runSimulation, 5),
 // This option works on Mac, but it would require all times to be long long on Windows
 //    MenuItem('6', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
-    MenuItem('M', string{"Average results from 100 Default Simulations"}, &runMultiple, 0),
     MenuItem('Q', string{"Quit"}, &doQuit, 0)
 };
 MenuGroup mainMenu = MenuGroup(mainMenus);

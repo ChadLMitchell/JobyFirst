@@ -56,7 +56,7 @@ bool longTestChargerQueue(int selector) {
     return false;
 }
 bool shortTestPlaneQueue(int selector) {
-    testPlaneQueueShort();
+    testPlaneQueueRandomMinimum();
     return false;
 }
 bool longTestPlaneQueue(int selector) {

@@ -35,6 +35,7 @@ struct PlaneQueueItem {
  */
 struct PlaneQueueStatusItem {
     int planeNumber;
+    Company planeCompany;
     long nextFlightTime;
 };
 /*
@@ -108,6 +109,6 @@ public:
 bool testPlaneQueueLong();
 
 // Test the class with minimal output, eventully TO DO would do automated test evaluation
-bool testPlaneQueueShort();
+bool testPlaneQueueRandomMinimum();
 
 #endif /* PlaneQueue_hpp */

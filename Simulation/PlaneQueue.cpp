@@ -77,25 +77,26 @@ void PlaneQueue::addPlane(long delayUntil, std::shared_ptr<Plane> aPlane) {
 void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachCompany) {
     
     // Set up an array of how many minimum are needed of each kind
-    long neededOfCompany[maxCompany + 1]{};
-    for(long i = 0; i <= maxCompany; i++) {
+    long neededOfCompany[companyCount]{};
+    for(long i = 0; i < companyCount; i++) {
         neededOfCompany[i] = minOfEachCompany;
     }
-    long totalCompanyStillNeeded{minOfEachCompany * (maxCompany + 1)};
+    
+    long totalCompanyStillNeeded{minOfEachCompany *companyCount};
     
     // Allocate planes to random Companies, with constraints
     std::vector<Company> companyChoices(count);
     for(long planesAllocated = 0; planesAllocated < count; planesAllocated++) {
         // initally they can be totally random.
-        long thisCompany = rand() % (maxCompany + 1);
-        // As long as we need some minimums, make sure we do those
+        long thisCompany = rand() % companyCount;
+        // As long as we need some minimums, make sure we do those first
         if(totalCompanyStillNeeded > 0) {
             // if so, adjust the selection until we find a Company needed
             long originalCompany = thisCompany; // save it to test for infinite loop
             while(neededOfCompany[thisCompany] <= 0) {
                 // increase it, wrapping around
                 // Warning, if this code is not right it could create an infinite loop
-                thisCompany = (thisCompany + 1) % (maxCompany + 1);
+                thisCompany = (thisCompany + 1) % companyCount;
                 if(thisCompany == originalCompany) {
                     // We have wrapped around and not found what we needed so stop trying
                     std::cout << "Cleared infinite loop. planesAllocated: " << planesAllocated <<
@@ -119,8 +120,7 @@ void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachComp
         maxDelay = theSimulation->theSettings->maxPassengerDelay;
     }
     // We do the actual allocation of planes as a separate step in case we want to add more processing first
-    for(long choiceIndex: companyChoices) {
-        Company thisChoice = companyChoices[choiceIndex];
+    for(long thisChoice: companyChoices) {
         // set up this plane's wait for passengers
         long waitForPassengers = 0;
         if(maxDelay > 0) {
@@ -165,7 +165,7 @@ void PlaneQueue::describeQueue(long currentTime) {
 std::vector<PlaneQueueStatusItem> PlaneQueue::getQueueStatus() {
     std::vector<PlaneQueueStatusItem> result{};
     for(auto aPlaneQueueItem: planesWaiting) {
-        PlaneQueueStatusItem anItem{aPlaneQueueItem.thePlane->getPlaneNumber(),aPlaneQueueItem.nextFlightTime};
+        PlaneQueueStatusItem anItem{aPlaneQueueItem.thePlane->getPlaneNumber(), aPlaneQueueItem.thePlane->getCompany(), aPlaneQueueItem.nextFlightTime};
         result.push_back(anItem);
     }
     return result;
@@ -195,27 +195,39 @@ bool testPlaneQueueLong() {
     
     return returnValue;
 }
-bool testPlaneQueueShort() {
-    const int testPlanes{5};
+bool testPlaneQueueRandomMinimum() {
+    const long testPlanes{20};
+    const long ofEachKind[]{0, 1, 2, 3, 4};
 
     bool returnValue = true;
     long currentTime = 0;
-    PlaneQueue aQueue(nullptr);
-    aQueue.setVerboseTesting(true);
-    std::cout << "Starting short test of PlaneQueue" << std::endl;
-    for(auto i=0; i<testPlanes; i++){
-        std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
-        aQueue.addPlane(currentTime, aPlane);
-    }
-
-    std::vector<PlaneQueueStatusItem> queueStatus = aQueue.getQueueStatus();
-    std::cout << "Planes on PlanesQueue:" << std::endl;
-    for(auto statusItem: queueStatus) {
-        // TO DO Instead of printing, we could feed in a specific set of planes and then confirm that the results are as expected.
-        // That would be more of an automated test like some of the others. We could also do some time jumps and confirm those results.
-        std::cout << "    Plane #" << statusItem.planeNumber << " next flight time: " << statusItem.nextFlightTime << std::endl;
-
-    }
+    std::cout << "Starting test of PlaneQueue" << std::endl;
     
+    for(auto ofEach: ofEachKind) {
+        std::cout << "With the minimum of each kind == " << ofEach << ":" << std::endl;
+        // Set up a PlaneQueue and populate it with planes
+        PlaneQueue aQueue(nullptr);
+        aQueue.setVerboseTesting(true);
+        aQueue.generatePlanes(currentTime, testPlanes, ofEach);
+        // Get the list of planes
+        std::vector<PlaneQueueStatusItem> queueStatus = aQueue.getQueueStatus();
+        // Count the kinds of planes
+        long kindCounts[companyCount]{};
+       // Output the list the planes
+        std::cout << "Planes on PlanesQueue:" << std::endl;
+        for(auto statusItem: queueStatus) {
+            kindCounts[statusItem.planeCompany]++;
+            std::cout << "    Plane #" << statusItem.planeNumber
+            << " from " << companyName(statusItem.planeCompany)
+            << " next flight time: " << statusItem.nextFlightTime << std::endl;
+        }
+        // Output the kind counts
+        std::cout << "Planes counts:" << std::endl;
+        for(auto kind: allCompany) {
+            std::cout << "    " << kindCounts[kind]
+            << " from " << companyName(kind) << std::endl;
+        }
+        std::cout << std::endl;
+    }
     return returnValue;
 }

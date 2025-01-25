@@ -81,7 +81,7 @@ const std::string Flight::describe() {
 void Flight::recordFlight() {
     long flightDuration = endTime-startTime;
     double passengerMiles = flightDuration * passengerCount * thePlane->getMilesPerHour();
-    passengerMiles /= 3600.0;
+    passengerMiles /= secondsPerHourD;
     if(theSimulation) {
         FlightStats someStats{thePlane->getCompany(),thePlane->getPlaneNumber(), flightDuration,passengerCount,faultCount, passengerMiles};
         theSimulation->theFlightStats.push_back(someStats);

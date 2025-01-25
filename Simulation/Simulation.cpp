@@ -103,7 +103,6 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     //      long totalPassengerMiles;
     // };
     std::vector<FinalStats> returnValue{};
-    const long seconds_per_hour = 60*60;
     extern PlaneSpecification planeSpecifications[];
     long totalFlights{0};
     long totalCharges{0};
@@ -116,7 +115,7 @@ std::vector<FinalStats> Simulation::run(bool verbose)
         if(chargeCountD <= 0) chargeCountD = 1.0; // so we avoid division by 0
         double averageTime = totalFlightStats[c].duration/flightCountD;
         FinalStats stats{c,  flightCounts[c], averageTime,
-            averageTime * planeSpecifications[c].cruise_speed__mph / seconds_per_hour,
+            averageTime * planeSpecifications[c].cruise_speed__mph / secondsPerHourD,
             chargeCounts[c],
             totalChargerStats[c].duration / chargeCountD,
             totalChargerStats[c].durationWithWait / chargeCountD,
@@ -126,7 +125,7 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     }
     
     std::cout << "Final simulated time: " << theSimClock->getTime() << " seconds (" <<
-    theSimClock->getTime()/(60.0*60.0) << " hours)" << std::endl;
+    theSimClock->getTime()/(secondsPerHourD) << " hours)" << std::endl;
     std::cout << totalFlights << " flights and " << totalCharges << " charges" << std::endl;
     std::cout << std::endl;
     

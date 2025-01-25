@@ -13,6 +13,12 @@
 #include <queue>
 #include <string>
 
+// These are used to help us convert from hours and minutes to seconds
+const long secondsPerHour{60 * 60}; // Converting seconds to hours and hours to seconds
+const double secondsPerHourD{60.0 * 60.0}; // For floating point calcuations
+const long defaultTestClockSeconds{secondsPerHour * 3}; //3 hours
+const long longTestClockSeconds{secondsPerHour * 30}; //30 hours
+const long shortTestClockSeconds{60}; //1 minute
 
 // These are settings for the simulator. We can pass a copy of these into the Simulator
 // constructor to run with these. To use the defaults, create a SimSettings object with
@@ -32,7 +38,7 @@ struct SimSettings {
     // 0 = enough passengers are always available
     // > 0 = randomly distribute delay between 0 and max for each flight
 
-    long long simulationDuration = 60*60*3; // default 3 hours
+    long simulationDuration = defaultTestClockSeconds; // default 3 hours
     
     long chargerCount = 3;
     
@@ -41,9 +47,24 @@ struct SimSettings {
     long minPlanePerKind = 1;
 };
 
-// These are used to help us convert from hours and minutes to seconds
-const long long defaultTestClockSeconds{60*60*3}; //3 hours
-const long long shortTestClockSeconds{60}; //1 minute
-const long long longTestClockSeconds{60*60*30}; //30 hours
+// enumeration of the possible company/kinds of planes
+enum Company {
+    Alpha = 0,
+    Bravo,
+    Charlie,
+    Delta,
+    Echo
+};
+// Allow iterating through the Company enumeration
+const Company allCompany[] = {Alpha, Bravo, Charlie, Delta, Echo};
+// Minimum and maximum elements of the Company enumeration
+const Company minCompany{Alpha};
+const Company maxCompany{Echo};
+const long companyCount = maxCompany + 1;
+
+// Reference to an array of company names
+extern const char *companyNames[];
+// Global function that takes a company enumeration and returns a company name
+const char *companyName(Company c);
 
 #endif /* SimSettings_hpp */

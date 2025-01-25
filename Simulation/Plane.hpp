@@ -13,25 +13,7 @@
 #include <queue>
 #include <string>
 #include <iostream>
-
-// enumeration of the possible company/kinds of planes
-enum Company {
-    Alpha = 0,
-    Bravo,
-    Charlie,
-    Delta,
-    Echo
-};
-// Allow iterating through the Company enumeration
-const Company allCompany[] = {Alpha, Bravo, Charlie, Delta, Echo};
-// Minimum and maximum elements of the Company enumeration
-const Company minCompany{Alpha};
-const Company maxCompany{Echo};
-
-// Reference to an array of company names
-extern const char *companyNames[];
-// Global function that takes a company enumeration and returns a company name
-const char *companyName(Company c);
+#include "SimSettings.hpp"
 
 // Specifications provided by the assigned task
 /*
@@ -94,7 +76,7 @@ public:
     const std::string describe();
 
     // Get from the specification
-    long getMilesPerHour();
+    double getMilesPerHour();
 
     // Calculate from the specification
     long calcTimeToCharge__seconds();
