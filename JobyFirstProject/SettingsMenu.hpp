@@ -14,6 +14,7 @@
 #include <string>
 #include "CmdLineMenus.hpp"
 
+// See the .cpp file for documentation
 bool editSettings(int selector, MenuGroup &thisMenuGroup);
 
 #endif /* SettingsMenu_hpp */

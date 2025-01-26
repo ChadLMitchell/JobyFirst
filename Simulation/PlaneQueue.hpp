@@ -106,9 +106,9 @@ public:
 };
 
 // Test the class with verbose output that can be manually reviewed
-bool testPlaneQueueWaits();
+bool testPlaneQueueForWaits();
 
 // Test the class with minimal output, eventully TO DO would do automated test evaluation
-bool testPlaneQueueMinimumPerKind();
+bool testPlaneQueueForMinimumPerKind();
 
 #endif /* PlaneQueue_hpp */

@@ -14,6 +14,7 @@
 #include <string>
 #include "CmdLineMenus.hpp"
 
+// See the .cpp file for documentation
 extern MenuGroup mainMenu;
 
 #endif /* MainMenu_hpp */

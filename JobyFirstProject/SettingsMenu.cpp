@@ -53,16 +53,21 @@ bool setPlaneCount(int selector, MenuGroup &thisMenuGroup) {
 
 // Get input from the user for the value for currentSettings.minPlanePerKind
 bool setMinimumPlaneOption(int selector, MenuGroup &thisMenuGroup) {
-    // With companyCount kinds, we need minPlanePerKind * companyCount to be <= planeCount
-    // This is a deliberate use of integer math to round down to the highest integer that works
+    // With companyCount kinds, we need minPlanePerKind * companyCount to be <= planeCount.
+    // The code will work if that constraint is not honored, but if minPlanePerKind is higher than that then
+    // it does not produce a meaningful restriction on the distribution of planes
+    // The following line is a deliberate use of integer math to round down to the highest integer that works
     long maxMinPlanePerKind = currentSettings.planeCount / companyCount;
     string message = "Input minimum number of planes per kind [0 - " + to_string(maxMinPlanePerKind) + "]: ";
+    // loop until we receive a number we can use
     while(true) {
         long tempMinPlanePerKind = getNumberFromUser(message);
         if(tempMinPlanePerKind >= 0 && tempMinPlanePerKind <= maxMinPlanePerKind) {
+            // If we get a numbert that works, store it in the settings and exit the function
             currentSettings.minPlanePerKind = tempMinPlanePerKind;
             return false;
         }
+        // Explain and ask them to try again
         cout << "With " << currentSettings.planeCount << " total planes and "
         << companyCount << " different kinds, the max for this setting is "
         << maxMinPlanePerKind << endl;
@@ -117,7 +122,7 @@ bool setFaultOption(int selector, MenuGroup &thisMenuGroup) {
     return false;
 }
 
-// Implement settings menu
+// Implement the main settings menu
 bool returnToMainMenu(int selector, MenuGroup &thisMenuGroup) {
     debugMessage("===> Chose return to main menu\n");
     return true;
@@ -134,6 +139,9 @@ vector<MenuItem> settingsMenus {
     MenuItem('M', string{"Return to Main Menu"}, &returnToMainMenu, 0)
 };
 MenuGroup settingsMenu = MenuGroup(settingsMenus);
+
+// This is the only external entry point to this file that is called when we want to display
+// and use the manage the settings menu.
 bool editSettings(int selector, MenuGroup &thisMenuGroup) {
     debugMessage("===> Selected Edit Settings");
     settingsMenu.runMenu();

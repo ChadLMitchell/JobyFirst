@@ -26,7 +26,7 @@
  */
 class EventHandler {
 protected:
-    long nextEventTime;
+    long nextEventTime; // this is the next time this handler wants to be called
 public:
     EventHandler(long nextEventTime);
     virtual ~EventHandler();

@@ -173,7 +173,7 @@ std::vector<PlaneQueueStatusItem> PlaneQueue::getQueueStatus() {
 
 }
 
-bool testPlaneQueueWaits() {
+bool testPlaneForQueueWaits() {
     const int testPlanes{5};
     const long ofEachKind{1};
     const long maxWait{20};
@@ -196,7 +196,7 @@ bool testPlaneQueueWaits() {
     std::cout << std::endl;
     return returnValue;
 }
-bool testPlaneQueueMinimumPerKind() {
+bool testPlaneQueueForMinimumPerKind() {
     const long testPlanes{10};
     const long ofEachKindArray[]{0, 1, 2};
     const long repeatGenerations{5}; // How many times to try each option

@@ -25,6 +25,8 @@ using namespace std;
 // Refer to the current settings to be used in creating simulations
 extern SimSettings currentSettings;
 
+// This function displays the curernt settings to cout
+// Where a settign has several options, it displays a string describing the selected option
 void outputSettings(const SimSettings &s)
 {
     cout << "Simulation Settings:" << endl;
@@ -43,9 +45,12 @@ void outputSettings(const SimSettings &s)
     cout << endl;
 }
 
+// This function displays the results of a simulation run.
+// The results vector could be that returned directly from Simulation.run(),
+// but it could also be summary of a series of simulations.
 void outputResults(std::vector<FinalStats> results)
 {
-    // Output the results
+// For reference, the structure is copied here during development and to help understand the code
     // struct FinalStats {
     //      Company theCompany;
     //      long totalFlights;
@@ -58,7 +63,7 @@ void outputResults(std::vector<FinalStats> results)
     //      long totalPassengerMiles;
     // };
     
-    // Statistics from this simulation
+    // Display a header with two row column names
     cout << left << setw(17) << "Company"
     << left << setw(9) << "Total "
     << left << setw(13) << "Avgerage "
@@ -79,6 +84,8 @@ void outputResults(std::vector<FinalStats> results)
     << left << setw(8) << "Faults "
     << left << setw(15) << "Passenger Miles"
     << endl;
+
+    // Display the results for each company
     for(auto r: results) {
         cout << setprecision(2) << fixed
         << left << setw(17) << companyName(r.theCompany)
@@ -94,34 +101,50 @@ void outputResults(std::vector<FinalStats> results)
     }
 
 }
+
+// Run a simulation. This function uses the memuItem selector to run different simulations
+// with the same function.
 bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     debugMessage("===> Selected Run Simulation");
     // Make a copy of the current settings so any changes we make here are
     // temporary and do not affect future simulations
     SimSettings runSettings = currentSettings;
+    
+    // If they selected one of the Stress Test options then we adjust the settings to match
     if(selector == 2) {
         runSettings.simulationDuration = secondsPerHour * 30; // 30 hours
     } else if(selector == 3) {
-        runSettings.simulationDuration = secondsPerHour * 300; // 300 hours
+        runSettings.simulationDuration = secondsPerHour * 300; // 300 hours (12.5 days)
     } else if(selector == 4) {
-        runSettings.simulationDuration = secondsPerHour * 3000; // 3000 hours
+        runSettings.simulationDuration = secondsPerHour * 3000; // 3000 hours (125 days)
     } else if(selector == 5) {
-        runSettings.simulationDuration = secondsPerHour * 35040; // 35040 hours
-// This option works on Mac, but it would require all times to be long long on Windows
+        runSettings.simulationDuration = secondsPerHour * 35040; // 35040 hours (4 years)
+// Tested 300000 hours on a Mac, but since "long" is 4 bytes on Windows, that value would not work on
+// Windows unless we carefull change everywhere a time is used in all the code to be "long long"
+// which did not seem worth the couple hours effort and testing at this point.
 //    } else if(selector == 6) {
-//        runSettings.simulationDuration = longTestClockSeconds * 10000; // 300,000 hours
+//        runSettings.simulationDuration = longTestClockSeconds * 300000; // 300,000 hours
     }
 
+    // Create and run the simulation
     Simulation aSimulation(runSettings);
+    // If the selectorValue == 1 that was used to run a verbose simulation (useful for testing)
     std::vector<FinalStats> results = aSimulation.run(selector == 1 ? true : false);
+    
     outputSettings(runSettings);
     cout << "Results for this simulation run:" << endl;
     outputResults(results);
 
     return false;
 }
+
+// Run multiple simulations (specified in runCount) and then average the results.
 bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
     debugMessage("===> Selected Run Multiple Simulations");
+
+    // Make a copy of the current settings so any changes we make here are
+    // temporary and do not affect future simulations. This function does not
+    // change the settings, but still good practice in case we change some later.
     SimSettings runSettings = currentSettings;
 
     const int runCount = 100;
@@ -133,13 +156,19 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
         accumulatedStats.push_back(f);
     }
 
+    // The Simulator function times individual simulations, but this will time the series
     auto startTimer = std::chrono::high_resolution_clock::now();
+    
+    // Repeat the simulation with the current parameters
     for(int run = 0; run < runCount; run++) {
         // run each simulation
         Simulation aSimulation(runSettings);
         std::vector<FinalStats> results = aSimulation.run(false);
 
         // accumulate the results
+        // TO DO: Faily confident that none of these overflow the capacity of long and double as we
+        // go, but with a higher runCount that could be a problem. Need to add checking to make
+        // sure as we accumulate things that we do not lose data.
         for(auto c: allCompany) {
             //      long totalFlights;
             //      double averageTimePerFlight;
@@ -159,15 +188,19 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
             accumulatedStats[c].totalPassengerMiles += results[c].totalPassengerMiles;
         }
     }
+    
+    // Output the cumulative run time for the series of simulations
     auto stopTimer = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
     double secondsTaken = duration.count() / 1000000.0;
-
     std::cout << "Total time taken by all simulations: "
     << duration.count() << " microseconds ("
     << secondsTaken << " seconds)" << std::endl;
 
     // turn totals into averages
+    // TO DO: It might be interesting to also output some of the grand totals
+    // but some of them would not be meaningful so we can't just call outputResults
+    // here. Maybe we could just to see how close we come to overflowing long or double
     for(auto c: allCompany) {
         accumulatedStats[c].totalFlights /= runCount;
         accumulatedStats[c].averageTimePerFlight /= runCount;
@@ -184,11 +217,14 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
 
     return false;
 }
+
+// This handles quitting the simulation by returning false when this is in MenuFuncPtr.
 bool doQuit(int selector, MenuGroup &thisMenuGroup) {
     debugMessage("===> Selected Quit");
     return true;
 }
 
+// The menu dwscriptions
 vector<MenuItem> mainMenus {
     MenuItem('E', string{"Edit Settings"}, &editSettings, 0),
     MenuItem('R', string{"Run Simulation with Current Settings"}, &runSimulation, 0),
@@ -201,9 +237,12 @@ vector<MenuItem> mainMenus {
     MenuItem('2', string{"Run 300-hour (12.5 Day) Simulation"}, &runSimulation, 3),
     MenuItem('3', string{"Run 3,000-hour (125 Day) Simulation"}, &runSimulation, 4),
     MenuItem('4', string{"Run 35,040-hour (4 year) Simulation"}, &runSimulation, 5),
-// This option works on Mac, but it would require all time variablese to be long long on Windows
+// The following option worked on Mac, but it would require all time variables in the entire
+// project to carefully be changed to "long long" on Windows
 //    MenuItem('5', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
     MenuItem('-', string{""}, nullptr, 0),
     MenuItem('Q', string{"Quit"}, &doQuit, 0)
 };
+
+// This is the external entry point to the menu system accessed by main()
 MenuGroup mainMenu = MenuGroup(mainMenus);
