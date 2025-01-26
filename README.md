@@ -37,7 +37,7 @@ Note: The files are in separate directories to later facilitate the Simulation a
 
 ### Passenger Count Options
 - **Option 0**: Maximum passenger capacity
-- **Option 1 or**: Random 1-to-max passenger count
+- **Option 1**: Random 1-to-max passenger count
 
 ### Passenger Delay Explaination
 - **If == 0**: Planes fly as soon as ready
