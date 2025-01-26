@@ -173,7 +173,7 @@ std::vector<PlaneQueueStatusItem> PlaneQueue::getQueueStatus() {
 
 }
 
-bool testPlaneForQueueWaits() {
+bool testPlaneQueueForWaits() {
     const int testPlanes{5};
     const long ofEachKind{1};
     const long maxWait{20};
