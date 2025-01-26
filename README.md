@@ -67,3 +67,8 @@ Note: The files are in separate directories to later facilitate the Simulation a
    - Verbose debugging mode
    - Sub-menu for some unit tests
    - Several levels of stress tests
+
+## Author
+
+Chad Mitchell
+(https://github.com/ChadLMitchell)
