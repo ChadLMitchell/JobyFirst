@@ -83,10 +83,10 @@ public:
     // process events (until something changes).
     virtual bool handleEvent(long currentTime, bool closeOut) override;
     
-    // For testing: count how may planes are in the queue or on chargers
+    // For testing: total how may planes are in the wait queue or a charger
     virtual long countPlanes() override;
 
-    // For testing: provide a description of this object
+    // For testing: describe the object and counts of the queue and vector
     virtual const std::string describe() override;
 
     // Are the vector and chargers both empty?
@@ -103,9 +103,12 @@ public:
     // Captures the time the plane has already started waited in the queue (if any).
     void addCharger(long currentTime, long startedWaiting, std::shared_ptr<Plane> aPlane);
 
+    // Indicate that we are testing and want information in cout about ongoing actions
     void setVerboseTesting(bool newValue);
     
-    // Describe the current state of the queues for testing
+    // For testing: describe detailed current state of the queues.
+    // This is more detailed than the override of the generic describe() method.
+    // While describe() gives counts of planes, this lists them.
     void describeQueues(long currentTime);
 
     // Get status information in a vector so automated testing can check things
@@ -113,7 +116,15 @@ public:
 };
 
 // These are here to allow the test menus access to call them.
+
+// This does a longer test of the ChargerQueue class outputing verbose information
+// as it "simulates" being part of a simulation.
 bool testChargerQueueLong();
+
+// This does a shorter test of the ChargerQueue class. It collects informataion about the status and actions of the object into an vector
+// as it "simulates" being part of a simulation as it "simulates" being part of a simulation.
+// For now this then outputs to cout a summary of the results, but later we could do more automated
+// testing using expected values of the result vector for known inputs.
 bool testChargerQueueShort();
 
 #endif /* ChargerQueue_hpp */

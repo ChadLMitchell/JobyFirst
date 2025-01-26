@@ -92,7 +92,8 @@ public:
     void generatePlanes(long currentTime, long count, long minOfEachCompany, long maxPassengerDelay);
  
     // For testing: remove the next Plane from the vector independent of timing
-    // and return it to the caller.
+    // and return it to the caller. This is not currently used, but may be used
+    // later for additional unit tests.
     std::shared_ptr<Plane> removeNextPlane();
 
     // For testing: ask some actions to be sent to cout
@@ -105,10 +106,11 @@ public:
     std::vector<PlaneQueueStatusItem> getQueueStatus();
 };
 
-// Test the class with verbose output that can be manually reviewed
+// Test the way this class behaves with non-zero passenger wait times
 bool testPlaneQueueForWaits();
 
-// Test the class with minimal output, eventully TO DO would do automated test evaluation
+// Test that generatePlanes() properly allocates random planes that meet the
+// expected criteria
 bool testPlaneQueueForMinimumPerKind();
 
 #endif /* PlaneQueue_hpp */

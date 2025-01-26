@@ -51,19 +51,19 @@ struct SimSettings {
     // 0 = plane always flies full
     // 1 = randomly distribute number of passengers between 1 and max for each flight
 
-    // How do we handle faults? Do we just count them or do they affect operations?
-    int faultOption = 0;
-    // 0 = just count faults
-    // 1 = fault grounds plane immediately for duration of simulation
-    // 2 = fault grounds plane at the end of current flight for duration of simulation
-
-    //
+    // Is there a delay getting passengers when a plane is ready to fly?
     long maxPassengerDelay = 0;
     // 0 means passengers are always available when we have a plane ready
     // > 0 means passengers may not be available when a plane is ready.
     // In the later case, when a plane is ready it will wait a random
     // amount of time from 0 to maxPassengerDelay until starting the next
     // flight.
+
+    // How do we handle faults? Do we just count them or do they affect operations?
+    int faultOption = 0;
+    // 0 = just count faults
+    // 1 = fault grounds plane immediately for duration of simulation
+    // 2 = fault grounds plane at the end of current flight for duration of simulation
 };
 
 /*
@@ -71,7 +71,7 @@ struct SimSettings {
  * Companies (types of planes)
  * Later we could make these options as well, but for now they are hard wired into the
  * simulation so we provide these constants to work with them. It is easy to change these
- * here, but they are not currently ruser settable options like those above.
+ * here, but they are not currently user settable options like those above.
  *******************************************************************************************
  */
 // enumeration of the possible companies (kinds of planes)

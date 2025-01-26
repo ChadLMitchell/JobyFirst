@@ -26,6 +26,12 @@ void SimClock::addHandler(std::shared_ptr<EventHandler> aHandler) {
     }
     eventHandlers.insert(handlerPtr, aHandler);
 }
+
+// One of our handlers thinks that it may be in the wrong order in the vector due to internal changes.
+// If we can find the charger in the queue, we remove it and insert it back in, sorting it in the proper
+// location. But if the handler is not in the queue than nothing happens. For example, if a handler
+// asks us to do this while responding to a handleEvent() call, we already removed it from the vector
+// before calling handleEvent() and will add it back when that handleEvent() returns so no need to do anyting now.
 void SimClock::reSortHandler(std::shared_ptr<EventHandler> aHandler) {
     auto handlerPtr = begin(eventHandlers);
     while(handlerPtr != end(eventHandlers)) {

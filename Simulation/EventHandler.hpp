@@ -44,7 +44,7 @@ public:
     // Flights may return false if the flight is no longer needed after the event.
     virtual bool handleEvent(long currentTime, bool closeOut);
 
-    // For testing: count how may planes are in this "queue"
+    // For testing: count how may planes are in this handler
     virtual long countPlanes();
 
     // For testing: provide a description of the object
