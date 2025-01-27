@@ -239,7 +239,7 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
         std::vector<FinalStats> results = aSimulation.run(false);
 
         // accumulate the results
-        // TO DO: Faily confident that none of these overflow the capacity of long and double as we
+        // TO-DO: Faily confident that none of these overflow the capacity of long and double as we
         // go, but with a higher runCount that could be a problem. Need to add checking to make
         // sure as we accumulate things that we do not lose data.
         for(auto c: allCompany) {
@@ -271,7 +271,7 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
     << secondsTaken << " seconds)" << std::endl;
 
     // turn totals into averages
-    // TO DO: It might be interesting to also output some of the grand totals
+    // TO-DO: It might be interesting to also output some of the grand totals
     // but some of them would not be meaningful so we can't just call outputResults
     // here. Maybe we could just to see how close we come to overflowing long or double
     for(auto c: allCompany) {

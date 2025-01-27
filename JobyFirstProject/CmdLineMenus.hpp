@@ -39,7 +39,7 @@ public:
     // Allows extensions
     virtual bool runSpecial(); // placeholder for children to add functionaltiy
     
-    // Get simple number input. TO DO add range checking, etc.
+    // Get simple number input. TO-DO add range checking, etc.
     long getNumberFromUser(std::string prompt);
 };
 

@@ -201,7 +201,7 @@ bool SimClock::run(bool verbose) {
 }
 
 // For testing: sum all the planes in all of the handlers
-// TO DO: use this in some testing to ensure that all planes exist througohut the simulation and that a plane is
+// TO-DO: use this in some testing to ensure that all planes exist througohut the simulation and that a plane is
 // never in more than one place at the same time.
 long SimClock::countPlanes() {
     long returnValue = 0;

@@ -12,7 +12,7 @@
 #include "CmdLineMenus.hpp"
 using namespace std;
 
-// TO DO Move all text constants (char and string) to a separate file that could then be loaded
+// TO-DO Move all text constants (char and string) to a separate file that could then be loaded
 // from a file or resources and also to allow localization.
 const char* menuPrompt {"Please select a menu item"}; // Initial menu propt
 const char* unrecognizedSelection {"Unrecognized menu selection: "}; // Indicate inncorrect input
@@ -119,7 +119,7 @@ bool MenuGroup::runSpecial() {
     return false;
 }
 
-// Get simple number input. TO DO add range checking, etc.
+// Get simple number input. TO-DO add range checking, etc.
 long MenuGroup::getNumberFromUser(std::string prompt) {
     cout << prompt;
     long result = 1;

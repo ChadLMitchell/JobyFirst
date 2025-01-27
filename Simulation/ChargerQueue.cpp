@@ -305,7 +305,7 @@ bool testChargerQueueShort() {
     // For now we will just list the planes in the object
     std::cout << "Planes on chargers:" << std::endl;
     for(auto statusItem: queueStatus) {
-        // TO DO Instead of printing, we could feed in a specific set of planes and then confirm that the results are as expected.
+        // TO-DO Instead of printing, we could feed in a specific set of planes and then confirm that the results are as expected.
         // That would be more of an automated test like some of the others. We could also do some time jumps and confirm those results.
         if(doingOnChargers && !statusItem.onCharger) {
             std::cout << "Planes waiting for chargers:" << std::endl;
