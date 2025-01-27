@@ -121,6 +121,10 @@ public:
     
     // This function runs the simulation and returns the results
     std::vector<FinalStats> run(bool verbose);
+    
+    // How often do we show progress indicator (<= 0 means not at all)
+    // This decides it based on settings
+    long getProgressInterval();
 };
 
 #endif /* Simulation_hpp */

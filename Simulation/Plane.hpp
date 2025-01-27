@@ -66,28 +66,28 @@ public:
     // For testing: get the Company enum assigned to this plane
    Company getCompany();
 
-    // For testing: get the name of the company assigned
+// For testing: get the name of the company assigned
    const char *getCompanyName();
 
     // For testing: get the plane number
     int getPlaneNumber();
 
-    // For testing: provide a description of this object
+    // For testing: provide a description of this plane
     const std::string describe();
 
     // Get from the specification
     double getMilesPerHour();
 
-    // Calculate from the specification
+    // Calculate from the specifications
     long calcTimeToCharge__seconds();
 
-    // Calculate from the specification
+    // Calculate from the specifications
     double calcDistanceFullCharge__miles();
 
-    // Calculate from the specification
+    // Calculate from the specifications
     long calcTimeOnFullCharge__seconds();
 
-    // Calculate from the specification
+    // Calculate from the specifications
     double calcMeanTimeBetweenFaults();
 
     // Get from the specification

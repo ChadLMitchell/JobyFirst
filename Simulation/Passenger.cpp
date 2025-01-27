@@ -19,9 +19,11 @@ std::mt19937 Passenger::generator(a_random_device());
 // If passengerCountOption == 1 then each plane files with a randome number
 // of passengers in the range [1 - maxPassengers].
 long Passenger::getPassengerCount(long maxPassengers,  std::shared_ptr<SimSettings> theSettings) {
+    // if there are no settings or the option is 0, planes fly full
     if(theSettings == nullptr || theSettings->passengerCountOption == 0) {
         return maxPassengers;
     }
+    // Get a random number of passengers in [1 - maxPassengers]
     std::uniform_int_distribution<> passengerDistribution(1, static_cast<int>(maxPassengers));
     return passengerDistribution(generator);
 };
@@ -34,9 +36,11 @@ long Passenger::getPassengerCount(long maxPassengers,  std::shared_ptr<SimSettin
 // in the range [0 - maxPassengerDelay]. Planes that are grounded are also put into
 // PlaneQueue, but are given a dealy of LONG_MAX so they never are assigned to a flight.
 long Passenger::getPassengerDelay(long maxPassengerDelay) {
+    // If the maximum delay is not greater than 0 then there is no delay
     if(maxPassengerDelay <= 0) {
         return 0;
     }
+    // Get a random number of delays in [0 - maxPassengerDelay]
     std::uniform_int_distribution<> delayDistribution(0, static_cast<int>(maxPassengerDelay));
     return delayDistribution(generator);
 }

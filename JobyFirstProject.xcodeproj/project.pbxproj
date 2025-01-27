@@ -32,7 +32,6 @@
 /* Begin PBXFileReference section */
 		8326908D2D3B5AEF003D31F7 /* JobyFirstProject */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JobyFirstProject; sourceTree = BUILT_PRODUCTS_DIR; };
 		83859BBA2D3C52850020DC41 /* eVtol Simulation Problem - AnyTimeDomain V2.docx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "eVtol Simulation Problem - AnyTimeDomain V2.docx"; sourceTree = "<group>"; };
-		83859BBB2D3C52850020DC41 /* Ideas.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Ideas.md; sourceTree = "<group>"; };
 		83859BC32D3C52A90020DC41 /* JobyCalculations.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = JobyCalculations.xlsx; sourceTree = "<group>"; };
 		83859BC42D3C52A90020DC41 /* JobyProject.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = JobyProject.jpg; sourceTree = "<group>"; };
 		838D6FB82D42CCE9006B64C7 /* ChargerQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ChargerQueue.hpp; sourceTree = "<group>"; };
@@ -96,7 +95,6 @@
 			isa = PBXGroup;
 			children = (
 				83859BBA2D3C52850020DC41 /* eVtol Simulation Problem - AnyTimeDomain V2.docx */,
-				83859BBB2D3C52850020DC41 /* Ideas.md */,
 				83859BC32D3C52A90020DC41 /* JobyCalculations.xlsx */,
 				83859BC42D3C52A90020DC41 /* JobyProject.jpg */,
 			);

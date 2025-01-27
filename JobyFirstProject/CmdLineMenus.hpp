@@ -32,12 +32,15 @@ protected:
 public:
     MenuGroup(std::vector<MenuItem> &someMenus);
     virtual ~MenuGroup();
-
+    
     // Display the menu and handle user resposes until they requiest a higher level menu.
     void runMenu();
-
+    
     // Allows extensions
     virtual bool runSpecial(); // placeholder for children to add functionaltiy
+    
+    // Get simple number input. TO DO add range checking, etc.
+    long getNumberFromUser(std::string prompt);
 };
 
 // Each MenuItem includes a pointer to the function that it will call when selected

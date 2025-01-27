@@ -102,10 +102,50 @@ void outputResults(std::vector<FinalStats> results)
 
 }
 
+// Set up the progress indicator if it seems like this may be a longg run
+// This is done once per execution of the program to ensure that the monitor
+// or terminal program supports '\r' to allow overwriting lines on the screen
+// (some do not and on those monitors this would might annouyingly output
+// what might be hundreds of rows of progress indication.
+void setProgressIndicator(MenuGroup &thisMenuGroup, SimSettings &runSettings) {
+    // Note that this decides based on runSettings, but it updates both runSettings and currentSettings
+    // becasue we only want to set this once per execution of the program.
+
+    // If we already set it this run of the program, don't do it again
+    if(currentSettings.progressInterval != -1) { return; }
+    
+    // Don't bother to ask if it probably is too fast to need a progress indicator
+    // We need these passed in from the actual settings used to do the simulation
+    if(runSettings.simulationDuration <= secondsPerHour * runSettings.progressMoreThanHours &&
+       runSettings.planeCount <= runSettings.progressMoreThanPlanes ) {
+        return;
+    }
+    
+    // Confirm that '\r' works on their screen
+    cout << endl;
+    cout << "Line #1" << flush;
+    cout << "\rLine #2" << endl;
+    cout << "How many numbered lines do you see ('Line #1' and 'Line #2' or just 'Line #2')?" << endl;
+    long userResponse = thisMenuGroup.getNumberFromUser("Please enter '1' or '2' (Entering 1 turns on a progress indicator): ");
+    // Set both runSettings (for the current simulation) and currentSettings (so we don't ask again)
+    if(userResponse == 1) {
+        // Show progress every 100 hours for any simulation with duration more than progressMoreThanHours  or
+        // planeCountt more than progressMoreThanPlanes.
+        runSettings.progressInterval = runSettings.progressIntervalValue;
+        currentSettings.progressInterval = currentSettings.progressIntervalValue;
+    } else {
+        // Do not show progress
+        runSettings.progressInterval = 0;
+        currentSettings.progressInterval = 0;
+    }
+    cout << endl;
+}
+
 // Run a simulation. This function uses the memuItem selector to run different simulations
 // with the same function.
 bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     debugMessage("===> Selected Run Simulation");
+    
     // Make a copy of the current settings so any changes we make here are
     // temporary and do not affect future simulations
     SimSettings runSettings = currentSettings;
@@ -119,13 +159,24 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
         runSettings.simulationDuration = secondsPerHour * 3000; // 3000 hours (125 days)
     } else if(selector == 5) {
         runSettings.simulationDuration = secondsPerHour * 35040; // 35040 hours (4 years)
-// Tested 300000 hours on a Mac, but since "long" is 4 bytes on Windows, that value would not work on
-// Windows unless we carefull change everywhere a time is used in all the code to be "long long"
-// which did not seem worth the couple hours effort and testing at this point.
-//    } else if(selector == 6) {
-//        runSettings.simulationDuration = longTestClockSeconds * 300000; // 300,000 hours
+    } else if(selector == 6) {
+        runSettings.simulationDuration = secondsPerHour * 35040; // 35040 hours (4 years)
+        runSettings.planeCount = 1000; // 1000 planes
+        runSettings.chargerCount = 150; // 150 chargers
+        runSettings.maxPassengerDelay = secondsPerHour;
+        runSettings.minPlanePerKind = 100; // 100 minimum of each kind
+            // This means the first 500 will be allocated randomly, but constrained to have
+            // 100 plane each. The last 500 planes will be completely randomly allocated.
     }
 
+    // Set the progress indicator option (if needed)
+    // We pass in runSettings so it decides based on the simulation that will run
+    // but this function will also set currentSettings since we set it per execution of the program
+    setProgressIndicator(thisMenuGroup, runSettings);
+
+    if(selector == 6) {
+        cout << "This may take a few minutes..." << endl;
+    }
     // Create and run the simulation
     Simulation aSimulation(runSettings);
     // If the selectorValue == 1 that was used to run a verbose simulation (useful for testing)
@@ -146,6 +197,12 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
     // temporary and do not affect future simulations. This function does not
     // change the settings, but still good practice in case we change some later.
     SimSettings runSettings = currentSettings;
+
+ 
+    // Set the progress indicator option (if needed)
+    // We pass in runSettings so it decides based on the simulation that will run
+    // but this function will also set currentSettings since we set it per execution of the program
+    setProgressIndicator(thisMenuGroup, runSettings);
 
     const int runCount = 100;
     
@@ -237,9 +294,7 @@ vector<MenuItem> mainMenus {
     MenuItem('2', string{"Run 300-hour (12.5 Day) Simulation"}, &runSimulation, 3),
     MenuItem('3', string{"Run 3,000-hour (125 Day) Simulation"}, &runSimulation, 4),
     MenuItem('4', string{"Run 35,040-hour (4 year) Simulation"}, &runSimulation, 5),
-// The following option worked on Mac, but it would require all time variables in the entire
-// project to carefully be changed to "long long" on Windows
-//    MenuItem('5', string{"Run 300,000-hour (34.2 Year) Simulation"}, &runSimulation, 6),
+    MenuItem('5', string{"Run 4-year, 1000 Plane, 150 Chargers, up to 1 hour wait for passengers"}, &runSimulation, 6),
     MenuItem('-', string{""}, nullptr, 0),
     MenuItem('Q', string{"Quit"}, &doQuit, 0)
 };

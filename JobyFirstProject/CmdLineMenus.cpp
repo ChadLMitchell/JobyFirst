@@ -119,4 +119,20 @@ bool MenuGroup::runSpecial() {
     return false;
 }
 
-
+// Get simple number input. TO DO add range checking, etc.
+long MenuGroup::getNumberFromUser(std::string prompt) {
+    cout << prompt;
+    long result = 1;
+    bool success = false;
+    while(!success) {
+        cin >> result;
+        if(cin.fail()) {
+            cin.clear();
+            cin.ignore();
+            cout << "Please enter a number: ";
+        } else {
+            success = true;
+        }
+    }
+    return result;
+}

@@ -21,33 +21,15 @@ using namespace std;
 // Refer to the current settings to be used in creating simulations
 extern SimSettings currentSettings;
 
-// Simple number input. TO DO add range checking, etc.
-long getNumberFromUser(string prompt) {
-    cout << prompt;
-    long result = 1;
-    bool success = false;
-    while(!success) {
-        cin >> result;
-        if(cin.fail()) {
-            cin.clear();
-            cin.ignore();
-            cout << "Please enter a number: ";
-        } else {
-            success = true;
-        }
-    }
-    return result;
-}
-
 // Get input from the user for the value for currentSettings.chargerCount
 bool setChargerCount(int selector, MenuGroup &thisMenuGroup) {
-    currentSettings.chargerCount = getNumberFromUser("Input number of chargers to use: ");
+    currentSettings.chargerCount = thisMenuGroup.getNumberFromUser("Input number of chargers to use: ");
     return false;
 }
 
 // Get input from the user for the value for currentSettings.planeCount
 bool setPlaneCount(int selector, MenuGroup &thisMenuGroup) {
-    currentSettings.planeCount = getNumberFromUser("Input number of planes to use: ");
+    currentSettings.planeCount = thisMenuGroup.getNumberFromUser("Input number of planes to use: ");
     return false;
 }
 
@@ -61,7 +43,7 @@ bool setMinimumPlaneOption(int selector, MenuGroup &thisMenuGroup) {
     string message = "Input minimum number of planes per kind [0 - " + to_string(maxMinPlanePerKind) + "]: ";
     // loop until we receive a number we can use
     while(true) {
-        long tempMinPlanePerKind = getNumberFromUser(message);
+        long tempMinPlanePerKind = thisMenuGroup.getNumberFromUser(message);
         if(tempMinPlanePerKind >= 0 && tempMinPlanePerKind <= maxMinPlanePerKind) {
             // If we get a numbert that works, store it in the settings and exit the function
             currentSettings.minPlanePerKind = tempMinPlanePerKind;
@@ -78,9 +60,9 @@ bool setMinimumPlaneOption(int selector, MenuGroup &thisMenuGroup) {
 // Get input from the user for the value for currentSettings.simulationDuration
 bool setDuration(int selector, MenuGroup &thisMenuGroup) {
     if(selector == 4) {
-        currentSettings.simulationDuration = getNumberFromUser("Input Simulation duration (in seconds): ");
+        currentSettings.simulationDuration = thisMenuGroup.getNumberFromUser("Input Simulation duration (in seconds): ");
     } else {
-        currentSettings.simulationDuration = getNumberFromUser("Input Simulation duration (in hours): ") * secondsPerHour;
+        currentSettings.simulationDuration = thisMenuGroup.getNumberFromUser("Input Simulation duration (in hours): ") * secondsPerHour;
     }
     return false;
 }
@@ -102,7 +84,7 @@ bool setPassengerCountOption(int selector, MenuGroup &thisMenuGroup) {
 
 // Get input from the user for the value for currentSettings.maxPassengerDelay
 bool setPassengerDelayOption(int selector, MenuGroup &thisMenuGroup) {
-    currentSettings.maxPassengerDelay = getNumberFromUser("Input maximum wait for new passengers: ");
+    currentSettings.maxPassengerDelay = thisMenuGroup.getNumberFromUser("Input maximum wait for new passengers: ");
     return false;
 }
 

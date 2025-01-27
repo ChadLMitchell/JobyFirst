@@ -50,7 +50,7 @@ struct SimSettings {
     int passengerCountOption = 0;
     // 0 = plane always flies full
     // 1 = randomly distribute number of passengers between 1 and max for each flight
-
+    
     // Is there a delay getting passengers when a plane is ready to fly?
     long maxPassengerDelay = 0;
     // 0 means passengers are always available when we have a plane ready
@@ -58,12 +58,23 @@ struct SimSettings {
     // In the later case, when a plane is ready it will wait a random
     // amount of time from 0 to maxPassengerDelay until starting the next
     // flight.
-
+    
     // How do we handle faults? Do we just count them or do they affect operations?
     int faultOption = 0;
     // 0 = just count faults
     // 1 = fault grounds plane immediately for duration of simulation
     // 2 = fault grounds plane at the end of current flight for duration of simulation
+
+    // Do we show progress as the simulation proceeds?
+    int progressInterval = -1; // in hours, 0 == do not show, -1 == not yet set
+    // If they are on a monitor that does not honor '\r' this will fill their screen with
+    // rows of progress. But if their monitor honors '\r' this will show progress.
+    
+    // If the simulation passes eitehr of these two limits, then it may show probress if
+    // progressInterval != -1
+    const int progressMoreThanHours = 1000; // only show progress indicator if duration more than this
+    const int progressMoreThanPlanes = 100; // only show progress indicator if planes more than this
+    const int progressIntervalValue = 100; // default for how often we show progress, if we show it at all
 };
 
 /*
