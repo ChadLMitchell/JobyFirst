@@ -141,6 +141,18 @@ void setProgressIndicator(MenuGroup &thisMenuGroup, SimSettings &runSettings) {
     cout << endl;
 }
 
+bool continueWithLongSimulation = false;
+// Implement a menu that confirms the user wants to continue with long simulation
+bool selectContinueLong(int selector, MenuGroup &thisMenuGroup) {
+    continueWithLongSimulation = (selector == 1);
+    return true;
+}
+vector<MenuItem> continueLongMenus {
+    MenuItem('Y', string{"Yes, continue with long simulation"}, &selectContinueLong, 1),
+    MenuItem('N', string{"No, I will choose another option"}, &selectContinueLong, 0),
+};
+MenuGroup continueLongMenu = MenuGroup(continueLongMenus);
+
 // Run a simulation. This function uses the memuItem selector to run different simulations
 // with the same function.
 bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
@@ -160,6 +172,13 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     } else if(selector == 5) {
         runSettings.simulationDuration = secondsPerHour * 35040; // 35040 hours (4 years)
     } else if(selector == 6) {
+        // Make sure the user is read for a long run
+        cout << "This stress test could take 10 to 45 minutes depending on the computer" << endl;
+        cout << "Do you want to continue?" << endl;
+        continueLongMenu.runMenu();
+        if(!continueWithLongSimulation) { return false; }
+        cout << "This may take a while..." << endl;
+        
         runSettings.simulationDuration = secondsPerHour * 35040; // 35040 hours (4 years)
         runSettings.planeCount = 1000; // 1000 planes
         runSettings.chargerCount = 150; // 150 chargers
@@ -174,9 +193,6 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     // but this function will also set currentSettings since we set it per execution of the program
     setProgressIndicator(thisMenuGroup, runSettings);
 
-    if(selector == 6) {
-        cout << "This may take a few minutes..." << endl;
-    }
     // Create and run the simulation
     Simulation aSimulation(runSettings);
     // If the selectorValue == 1 that was used to run a verbose simulation (useful for testing)
