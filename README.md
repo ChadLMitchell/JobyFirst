@@ -51,9 +51,9 @@ Note: The files are in separate directories to later facilitate the Simulation a
 
 ## Performance
 
-- Typical 3-hour simulation (defualt 20 planes and 3 chargers): 300-800 microseconds
+- Typical 3-hour simulation (defualt of 20 planes and 3 chargers): 300-800 microseconds
 - Stress test simulating 35,040 hours (4 years): 1-2 seconds
-- Stress test simulating 4 years, 1000 planes, 150 chargers : 8-10 minutes
+- Stress test simulating 4 years, 1000 planes, 150 chargers : 10-45 minutes
 
 ## Running the Project
 
