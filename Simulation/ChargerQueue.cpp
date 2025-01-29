@@ -98,7 +98,7 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
         addCharger(currentTime, aWaitingPlane.timeStarted, aWaitingPlane.thePlane);
     }
     if(chargers.empty()) {
-        // If there are chargers in use (possible if all planes are in flight or waiting for passengers) then set our
+        // If there are no chargers in use (possible if all planes are in flight or waiting for passengers) then set our
         // nextEventTime to a value that assures our handleEvent will not be called until something changes elsewhere.
         nextEventTime = LONG_MAX;
     } else  {
