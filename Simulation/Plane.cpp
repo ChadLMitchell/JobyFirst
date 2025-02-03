@@ -146,7 +146,7 @@ long Plane::decrementNextFaultInterval(long seconds) {
 // as every plane is assigned the an intervaly according to the right random distribution.
 long Plane::createFaultInterval() {
     std::random_device rd;
-    std::mt19937 gen(rd());
+    std::mt19937 gen(useRandomSeed ? useRandomSeed : rd());
     // First generate a random real number between 0 and 1
     std::uniform_real_distribution<> distrib(0, 1);
     double random0to1 = distrib(gen);

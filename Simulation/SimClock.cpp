@@ -220,7 +220,7 @@ const int shortTestHandlerCount{5}; // How many test handlers are created for a 
 
 // Set up a random number generator and some distributions for the SimClock tests
 std::random_device rdTestHandler;
-std::mt19937 genTestHandler(rdTestHandler());
+std::mt19937 genTestHandler(useRandomSeed ? useRandomSeed : rdTestHandler());
 std::uniform_int_distribution<> distribTestHandlerDelay(2, maxRangeDelay);
 std::uniform_int_distribution<> distribTestHandlerRepeat(1, maxTestHandlerRepeat);
 

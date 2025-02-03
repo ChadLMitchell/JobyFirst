@@ -37,7 +37,7 @@ public:
     static long getPassengerCount(long maxPassengers, std::shared_ptr<SimSettings> theSettings);
 
     // This determines how long a delay there will be for a particular flight.
-    // Depending on the settings it may return 0 delay or some randome delay
+    // Depending on the settings it may return 0 delay or some random delay
     static long getPassengerDelay(long maxPassengerDelay);
 };
 

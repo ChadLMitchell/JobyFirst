@@ -19,6 +19,11 @@ const long secondsPerHour{secondsPerMinute * 60}; // Converting seconds to hours
 const double secondsPerHourD{secondsPerMinute * 60.0}; // For floating point calcuations
 const long defaultTestClockSeconds{secondsPerHour * 3}; //3 hours
 
+// How do we seed the random number generators?
+const long useRandomSeed = 100;
+// If this is non-zero, use this number to seed all random number generators
+// Otherwise use time(0) or (time(0) & INT_MAX)
+
 /*
  *******************************************************************************************
  * Struct SimSettings

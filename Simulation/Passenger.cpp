@@ -11,7 +11,7 @@
 
 
 std::random_device Passenger::a_random_device;
-std::mt19937 Passenger::generator(a_random_device());
+std::mt19937 Passenger::generator(useRandomSeed ? useRandomSeed : a_random_device());
 
 // This is called at the start of each flight to get the number of passengers.
 // There is an alternative controlled by the passengerCountOption setting.
