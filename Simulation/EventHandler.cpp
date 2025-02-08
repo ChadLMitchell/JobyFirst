@@ -23,12 +23,7 @@ EventHandler::EventHandler(long nextEventTime):  nextEventTime{nextEventTime} {
 EventHandler::~EventHandler() {
 }
 
-// Get protected variable (for testing since children access it directly)
-long EventHandler::getNextEventTime() {
-    return nextEventTime;
-}
-
-// Set protected variable(for testing since children access it directly)
+// Set protected variable (for testing since children access it directly)
 void EventHandler::setNextEventTime(long aTime) {
     nextEventTime = aTime;
 }

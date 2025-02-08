@@ -31,8 +31,8 @@ public:
     EventHandler(long nextEventTime);
     virtual ~EventHandler();
     
-    // Get protected variable (for testing since children access it directly)
-    long getNextEventTime();
+    // Get protected variable
+    long getNextEventTime() {return nextEventTime;} // Define it here so the compiler makes it inline
 
     // Set protected variable(for testing since children access it directly)
     void setNextEventTime(long aTime);
