@@ -61,7 +61,8 @@ bool Flight::handleEvent(long currentTime, bool closeOut) {
             if(theSimulation && theSimulation->thePlaneQueue) {
                 // "this" will be deleted so the plane will be owned by the plane queue
                 // We ground it by giving it an infinite delay
-                theSimulation->thePlaneQueue->addPlane(LONG_MAX, thePlane);
+                // Pass false because we are calling PlaneQueue.addPlane() from Flight.handleEvent, not from PlaneQueue.handleEvent
+                theSimulation->thePlaneQueue->addPlane(LONG_MAX, thePlane, false);
             }
             return false; // do not keep us in the event queue
         } else { // record fault and continue
@@ -100,14 +101,16 @@ bool Flight::handleEvent(long currentTime, bool closeOut) {
         // faultOption == 2 means we ground flight with a fault afer the flight completes
         if(theSimulation && theSimulation->thePlaneQueue) {
             // We ground it by giving it an infinite delay
-            theSimulation->thePlaneQueue->addPlane(LONG_MAX, thePlane);
+            // Pass false because we are calling PlaneQueue.addPlane() from Flight.handleEvent, not from PlaneQueue.handleEvent
+            theSimulation->thePlaneQueue->addPlane(LONG_MAX, thePlane, false);
         }
         // if there is no simulation this plane will be done anyway
    } else {
         // Otherwise try to put it back on a charger
         if(theSimulation && theSimulation->theChargerQueue) {
             // "this" will be deleted so the plane will be owned by the battery queue
-            theSimulation->theChargerQueue->addPlane(currentTime, thePlane);
+            // Pass false because we are calling PlaneQueue.addPlane() from Flight.handleEvent, not from PlaneQueue.handleEvent
+            theSimulation->theChargerQueue->addPlane(currentTime, thePlane, false);
         }
     }
     // by returning false "this" will be removed from the eventHandler queue

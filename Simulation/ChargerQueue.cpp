@@ -5,8 +5,9 @@
 //  Created by Chad Mitchell on 1/20/25.
 //
 
-#include "ChargerQueue.hpp"
+#include <algorithm>
 #include "Plane.hpp"
+#include "ChargerQueue.hpp"
 #include "Flight.hpp"
 #include "PlaneQueue.hpp"
 #include "Passenger.hpp"
@@ -62,13 +63,13 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
         return false;
     }
     // Handle any planes that are now fully charged
-    while(!chargers.empty() && chargers.back().timeDone <= currentTime) {
+    while(!chargers.empty() && lastCharger().timeDone <= currentTime) {
         // We keep the chargers sorted with the first to be done at the back of the vector
         // If the charger that will be done next is ready, remove the plane from the charger
-        std::shared_ptr<Plane> thePlane = chargers.back().thePlane;
+        std::shared_ptr<Plane> thePlane = lastCharger().thePlane;
         if(theSimulation) {
             // log this charge as completed
-            Charger aCharger = chargers.back();
+            Charger aCharger = lastCharger();
             ChargerStats someStats{aCharger.thePlane->getCompany(),
                 aCharger.thePlane->getPlaneNumber(),
                 currentTime - aCharger.timeStarted, currentTime - aCharger.timeStartedIncludingWait};
@@ -76,14 +77,21 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
         }
 
         // Remove the object charger from the vector. The object will be discarded, but we already saved a pointer to the plane.
+#if SORTED_CHARGER_QUEUE_TYPE == 2
+        auto endPtr = chargers.end();
+        endPtr--;
+        chargers.erase(endPtr);
+#else
         chargers.pop_back();
+#endif
         if(theSimulation && theSimulation->thePlaneQueue) {
             // If we are in a simulation get the passenger delay setting, otherwise default to 0.
             long maxPassengerDelay = 0;
             if(theSimulation->theSettings) { maxPassengerDelay = theSimulation->theSettings->maxPassengerDelay; }
             // Add the plane to the plane queue, ready to fly, asking a static Passenger class function to assign an actual
             // delay for this plane at this time. If maxPassengerDelay > 0 it will be set to some value in [0 - maxPassengerDelay].
-            theSimulation->thePlaneQueue->addPlane(currentTime + Passenger::getPassengerDelay(maxPassengerDelay),thePlane);
+            // Pass false because we are calling PlaneQueue.addPlane() from ChargerQueue.handleEvent, not from PlaneQueue.handleEvent
+            theSimulation->thePlaneQueue->addPlane(currentTime + Passenger::getPassengerDelay(maxPassengerDelay),thePlane, false);
         } else if(verboseTesting) {
             // if we are not in a simulation and are being verbose, mention what we would have done if we could
             std::cout << "Would add flight for " << thePlane->describe() << "to thePlaneQueue if Sim full simulation" << std::endl;
@@ -95,15 +103,15 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
         WaitingPlane aWaitingPlane = planesWaiting.front();
         planesWaiting.pop();
         // Create a charger option and add the plane to the vector of chargers being used
-        addCharger(currentTime, aWaitingPlane.timeStarted, aWaitingPlane.thePlane);
+        addCharger(currentTime, aWaitingPlane.timeStarted, aWaitingPlane.thePlane, true);
     }
     if(chargers.empty()) {
-        // If there are chargers in use (possible if all planes are in flight or waiting for passengers) then set our
+        // If there are no chargers in use (possible if all planes are in flight or waiting for passengers) then set our
         // nextEventTime to a value that assures our handleEvent will not be called until something changes elsewhere.
         nextEventTime = LONG_MAX;
     } else  {
         // Otherwise set our next time to the last charger in the queue (the first to be done)
-        nextEventTime = chargers.back().timeDone;
+        nextEventTime = lastCharger().timeDone;
     }
     // When we return true, the SimClock event handlers (which already removed us from it's vector of handlers) will insert us back in at
     // the right place keeping all the handlers sosrted.
@@ -130,15 +138,15 @@ bool ChargerQueue::isEmpty() {
 // queue which is managed FIFO.
 // When a charger is done, the plane will be moved back to the PlaneQueue. From there
 // the plane will be put into a flight as soon as it has passengers available.
-void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane) {
+void ChargerQueue::addPlane(long currentTime, std::shared_ptr<Plane> aPlane, bool fromEventHandler) {
     if(chargers.size() >= chargerCount) {
         WaitingPlane aWaitingPlane = WaitingPlane{currentTime, aPlane};
         planesWaiting.push(aWaitingPlane);
     } else {
-        addCharger(currentTime, currentTime, aPlane);
+        addCharger(currentTime, currentTime, aPlane, fromEventHandler);
     }
 }
-void ChargerQueue::addCharger(long currentTime, long startedWaiting, std::shared_ptr<Plane> aPlane) {
+void ChargerQueue::addCharger(long currentTime, long startedWaiting, std::shared_ptr<Plane> aPlane, bool fromEventHandler) {
     if(chargers.size() >= chargerCount) {
         // Catch an error. This should never be called if all chargers are full.
         std::cout <<"error: trying to add too many chargers " << std::endl;
@@ -148,23 +156,33 @@ void ChargerQueue::addCharger(long currentTime, long startedWaiting, std::shared
         // First calculate when this plane will be charged.
         long timeToCharged = currentTime + aPlane->calcTimeToCharge__seconds();
         // Insert the new charger into the first location that will keep it sorted.
+# if !(SORTED_CHARGER_QUEUE_TYPE == 2) // multiset always already sorted
         auto chargerPtr = begin(chargers);
         while(chargerPtr != end(chargers) &&  chargerPtr->timeDone > timeToCharged) {
             chargerPtr++;
         }
         // Create a charger object for the plane to keep track of starting and ending time of the charge
         Charger aCharger = Charger{currentTime, startedWaiting, timeToCharged, aPlane};
-        // Insert the charger into the righ tplace in the chargers vector
+        // Insert the charger into the right place in the chargers vector
         chargers.insert(chargerPtr, aCharger);
-        
-        if(nextEventTime != chargers.back().timeDone) {
+#else
+        // Create a charger object for the plane to keep track of starting and ending time of the charge
+        Charger aCharger = Charger{currentTime, startedWaiting, timeToCharged, aPlane};
+        // Insert the charger into the right place in the chargers vector
+        chargers.insert(aCharger);
+#endif
+        // Update our earliest charger done time if the insertion charged it
+        if(nextEventTime > aCharger.timeDone) {
+            nextEventTime = aCharger.timeDone;
             // If our earliest charger done time has changed, we need to be resorted in the SimClock
             // This could happen when the first charger is put into use, but also if a plane is put
             // on a charger that charges so much faster than other planes charging that it will be
-            // done first.
-            nextEventTime = chargers.back().timeDone; // adjust the next time for our queue
-            // Ask the theSimClock to re-sort this in it's queue (sorted vector).
-            if(theSimulation && theSimulation->theSimClock && theSimulation->theChargerQueue) {
+            // done first. Ask the theSimClock to re-sort this in it's queue (sorted vector).
+            // If we are called from the theChargerQueue eventHandler, optimize by not trying to resort
+            // theChargerQueue in the event queue because it will be reinserted into the right place
+            // after the eventHandler completes.
+            // If we are from ChargerQueue.eventHandler, we will be resorted after the handler so no need to do it now
+            if(!fromEventHandler && theSimulation && theSimulation->theSimClock && theSimulation->theChargerQueue) {
                 theSimulation->theSimClock->reSortHandler(theSimulation->theChargerQueue);
             }
         }
@@ -184,7 +202,7 @@ void ChargerQueue::describeQueues(long currentTime) {
     // List the planes on chargers
     if(chargers.size() == 0) {
         std::cout << "No planes on a charger" << std::endl;
-   } else {
+    } else {
         std::cout << "Planes on Chargers" << std::endl;
         for(auto aCharger: chargers) {
             std::cout << "    " << aCharger.thePlane->describe() << " done at " << aCharger.timeDone << std::endl;
@@ -193,7 +211,7 @@ void ChargerQueue::describeQueues(long currentTime) {
     // List the planes waiting for chargers
     if(planesWaiting.empty()) {
         std::cout << "No planes waiting for a Charger" << std::endl;
-   } else {
+    } else {
         std::cout << "Planes waiting for a Charger" << std::endl;
         // To view a queue we must pull everything off of it (and then put it all back)
         // This is not at all effecient, but we only do it for testing
@@ -260,7 +278,7 @@ bool testChargerQueueLong() {
     for(auto i=0; i<testPlanes; i++){
         std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
         std::cout << "Adding " << aPlane->describe() << std::endl;
-        aQueue.addPlane(currentTime, aPlane);
+        aQueue.addPlane(currentTime, aPlane, false);
     }
     // List the current current planes in the object
     aQueue.describeQueues(currentTime);
@@ -294,7 +312,7 @@ bool testChargerQueueShort() {
     // Add some planes to the object
     for(auto i=0; i<testPlanes; i++){
         std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
-        aQueue.addPlane(currentTime, aPlane);
+        aQueue.addPlane(currentTime, aPlane, false);
     }
 
     // Get the current status of the plans in a vector

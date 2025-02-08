@@ -11,10 +11,39 @@
 #include <stdio.h>
 #include <vector>
 #include <queue>
+#include <list>
+#include <set>
 #include <string>
 #include <iostream>
+#include "SimSettings.hpp"
 #include "EventHandler.hpp"
 #include "Simulation.hpp"
+
+#if SORTED_EVENT_QUEUE_TYPE == 2
+/*
+ *******************************************************************************************
+ * Struct EventHandlerSharedPtr
+ * This encapsulates a pointer to an EventHandler.
+ * We need this to give us a way to override the < and == operators when using multiset.
+ * Since we want chldren classes of EventHandler to be able to override some functions
+ * we need to make sure we are always using pointers to EventHandler objectss and not
+ * work on EventHandler objects directly.
+ *******************************************************************************************
+ */
+struct EventHandlerSharedPtr {
+    std::shared_ptr<EventHandler> theHandler;
+    EventHandlerSharedPtr(std::shared_ptr<EventHandler> aHandler): theHandler{aHandler} {}
+    
+    bool operator<(const EventHandlerSharedPtr& other) const {
+        // Reverse sort by nextEventTime (highest first, lowest last)
+        return theHandler->getNextEventTime() >= other.theHandler->getNextEventTime();
+    }
+    // Overload equality operator if needed, for example in erase operations
+    bool operator==(const EventHandlerSharedPtr& other) const {
+        return theHandler->getHandlerNumber() == other.theHandler->getHandlerNumber();
+    }
+};
+#endif
 
 /*
  *******************************************************************************************
@@ -39,8 +68,18 @@ class SimClock {
     long endTime; // When does this simulation end?
     long currentTime; // The current clock time
     bool needSort; // Set if another object might cause the handler queue to become unsorted.
-                    // It is checked at the start of each clock loop inside run().
-    std::vector<std::shared_ptr<EventHandler>> eventHandlers; // The sorged list of handlers
+    // It is checked at the start of each clock loop inside run().
+#if SORTED_EVENT_QUEUE_TYPE == 0
+    std::vector<std::shared_ptr<EventHandler>> eventHandlers; // The sorted list of handlers
+#else // SORTED_EVENT_QUEUE_TYPE == 1
+    
+#if SORTED_EVENT_QUEUE_TYPE == 1
+    std::list<std::shared_ptr<EventHandler>> eventHandlers; // The sorted list of handlers
+#else // SORTED_EVENT_QUEUE_TYPE == 2
+    std::multiset<EventHandlerSharedPtr> eventHandlers; // The sorted list of handlers
+#endif
+    
+#endif
     
     // This function is private so only this object can call it at times that are safe
     void sortHandlers();
@@ -68,6 +107,9 @@ public:
     
     // For testing: sum all the planes in all of the handlers
     long countPlanes();
+    
+    // For testing: verbose description of the current state of this object
+    void describeQueue(long currentTime);
 };
 
 // Test the class to validate some functionality

@@ -11,9 +11,12 @@
 #include <stdio.h>
 #include <vector>
 #include <queue>
+#include <list>
+#include <set>
 #include <string>
-#include "SimClock.hpp"
 #include "Plane.hpp"
+#include "SimSettings.hpp"
+#include "SimClock.hpp"
 
 /*
  *******************************************************************************************
@@ -28,6 +31,18 @@ struct Charger {
     long timeStartedIncludingWait;
     long timeDone;
     std::shared_ptr<Plane> thePlane;
+#if SORTED_CHARGER_QUEUE_TYPE == 2
+    // Overload less than operator for ordering in multiset
+    bool operator<(const Charger& other) const {
+        // Reverse sort by nextEventTime (highest first, lowest last)
+        return timeDone >= other.timeDone;
+    }
+
+    // Overload equality operator if needed, for example in erase operations
+    bool operator==(const Charger& other) const {
+        return thePlane->getPlaneNumber() == other.thePlane->getPlaneNumber();
+    }
+#endif
 };
 /*
  *******************************************************************************************
@@ -69,7 +84,17 @@ class ChargerQueue: public EventHandler {
     Simulation *theSimulation; // Simulation object containing current simulation or nullptr
     long chargerCount; // How many chargers in this simulation
     bool verboseTesting; // For testing, provides more details to cout
+#if SORTED_CHARGER_QUEUE_TYPE == 0
     std::vector<Charger> chargers; // Zero or more chargers (<= chargerCount)
+#else // SORTED_CHARGER_QUEUE_TYPE == 1 or 2
+ 
+#if SORTED_CHARGER_QUEUE_TYPE == 1
+    std::list<Charger> chargers; // Zero or more chargers (<= chargerCount)
+#else // SORTED_CHARGER_QUEUE_TYPE == 2
+    std::multiset<Charger> chargers; // Zero or more chargers (<= chargerCount)
+#endif
+
+#endif
     std::queue<WaitingPlane> planesWaiting; // Planes waiting for a charger
 public:
     ChargerQueue(Simulation *theSimulation, long chargerCount);
@@ -83,6 +108,16 @@ public:
     // process events (until something changes).
     virtual bool handleEvent(long currentTime, bool closeOut) override;
     
+        Charger lastCharger() { // only call this if !chargers.empty()
+#if SORTED_CHARGER_QUEUE_TYPE == 2
+        auto endPtr = chargers.end();
+        endPtr--;
+        return *endPtr;
+#else // SORTED_CHARGER_QUEUE_TYPE == 0 or 1
+        return chargers.back();
+#endif
+    }
+
     // For testing: total how may planes are in the wait queue or a charger
     virtual long countPlanes() override;
 
@@ -97,11 +132,14 @@ public:
     // When a charger is done, the plane is put in a flight or if we have passenger delays,
     // When the SimClock currentTime >= delayUntil the next call to handleEvent will put
     // the plane back into the planeQueue until it can be put into a flight.
-    void addPlane(long currentTime, std::shared_ptr<Plane> aPlane);
+    // If we are called from the theChargerQueue eventHandler, optimize by not trying to resort
+    // theChargerQueue in the event queue because it will be reinserted into the right place
+    // after the eventHandler completes.
+    void addPlane(long currentTime, std::shared_ptr<Plane> aPlane, bool fromEventHandler);
     
     // Add a plane to the charger. Should only be called if there are available chargers
     // Captures the time the plane has already started waited in the queue (if any).
-    void addCharger(long currentTime, long startedWaiting, std::shared_ptr<Plane> aPlane);
+    void addCharger(long currentTime, long startedWaiting, std::shared_ptr<Plane> aPlane, bool fromEventHandler);
 
     // Indicate that we are testing and want information in cout about ongoing actions
     void setVerboseTesting(bool newValue);

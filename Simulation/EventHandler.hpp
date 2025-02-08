@@ -8,6 +8,7 @@
 #ifndef EventHandler_hpp
 #define EventHandler_hpp
 
+#include "SimSettings.hpp"
 #include <stdio.h>
 #include <vector>
 #include <queue>
@@ -27,6 +28,8 @@
 class EventHandler {
 protected:
     long nextEventTime; // this is the next time this handler wants to be called
+    long handlerNumber;// Each handler is assigned a handler number (mostly for testing)
+    static int NextHandlerNumber; // Keep track of next number to assign
 public:
     EventHandler(long nextEventTime);
     virtual ~EventHandler();
@@ -34,6 +37,9 @@ public:
     // Get protected variable
     long getNextEventTime() {return nextEventTime;} // Define it here so the compiler makes it inline
 
+    // Get protected variable
+    long getHandlerNumber() { return handlerNumber; } // Define it here so the compiler makes it inline
+    
     // Set protected variable(for testing since children access it directly)
     void setNextEventTime(long aTime);
 

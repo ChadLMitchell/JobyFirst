@@ -11,7 +11,10 @@
 #include <stdio.h>
 #include <vector>
 #include <queue>
+#include <list>
+#include <set>
 #include <string>
+#include "SimSettings.hpp"
 #include "SimClock.hpp"
 #include "Plane.hpp"
 
@@ -25,6 +28,17 @@
 struct PlaneQueueItem {
     std::shared_ptr<Plane> thePlane;
     long nextFlightTime;
+#if SORTED_PLANE_QUEUE_TYPE == 2
+    // Overload less than operator for ordering in multiset
+    bool operator<(const PlaneQueueItem& other) const {
+        // Reverse sort by nextEventTime (highest first, lowest last)
+        return nextFlightTime >= other.nextFlightTime;
+    }
+    // Overload equality operator if needed, for example in erase operations
+    bool operator==(const PlaneQueueItem& other) const {
+        return thePlane->getPlaneNumber() == other.thePlane->getPlaneNumber();
+    }
+#endif
 };
 /*
  *******************************************************************************************
@@ -57,7 +71,17 @@ class PlaneQueue: public EventHandler {
     bool verboseTesting; // Option for testing to have the class output action descriptions
     // The following is a vector, not a queue because it is kept soonest at tne end and
     // we can add a Plane to it that has a our of order passengerDelay
+#if SORTED_PLANE_QUEUE_TYPE == 0
     std::vector<PlaneQueueItem> planesWaiting;
+#else // SORTED_PLANE_QUEUE_TYPE == 1
+
+#if SORTED_PLANE_QUEUE_TYPE == 1
+    std::list<PlaneQueueItem> planesWaiting;
+#else // SORTED_PLANE_QUEUE_TYPE == 2
+    std::multiset<PlaneQueueItem> planesWaiting;
+#endif
+
+#endif
 public:
     PlaneQueue(Simulation *theSimulation);
     virtual ~PlaneQueue()override;
@@ -71,6 +95,16 @@ public:
     virtual bool handleEvent(long currentTime, bool closeOut) override;
 
     // For testing: count how may planes are in this "queue"
+    PlaneQueueItem lastPlane() { // only call this if !chargers.empty()
+#if SORTED_PLANE_QUEUE_TYPE == 2
+        auto endPtr = planesWaiting.end();
+        endPtr--;
+        return *endPtr;
+#else // SORTED_PLANE_QUEUE_TYPE == 0 or 1
+        return planesWaiting.back();
+#endif
+    }
+
     virtual long countPlanes() override;
 
     // For testing: describe this object in the clock handler queue
@@ -82,7 +116,7 @@ public:
     // Add a plane to the vector, sorting it according to the delayUntil time.
     // When the SimClock currentTime >= delayUntil the next call to handleEvent will put
     // the plane into a filght and put that into the SimClock.
-    void addPlane(long delayUntil, std::shared_ptr<Plane> aPlane);
+    void addPlane(long delayUntil, std::shared_ptr<Plane> aPlane, bool fromEventHandler);
 
     // Fill the vector with planes with possible delays according to the settings.
     // In a simulation, these will then be put into flights as their time arrives,

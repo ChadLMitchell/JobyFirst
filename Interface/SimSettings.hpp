@@ -8,6 +8,19 @@
 #ifndef SimSettings_hpp
 #define SimSettings_hpp
 
+#define SORTED_EVENT_QUEUE_TYPE 2
+// 0 = vector
+// 1 = list
+// 2 = multiset
+#define SORTED_PLANE_QUEUE_TYPE 1
+// 0 = vector
+// 1 = list
+// 2 = multiset
+#define SORTED_CHARGER_QUEUE_TYPE 2
+// 0 = vector
+// 1 = list
+// 2 = multiset
+
 #include <stdio.h>
 #include <vector>
 #include <queue>

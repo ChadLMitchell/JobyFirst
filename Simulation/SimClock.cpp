@@ -5,6 +5,7 @@
 //  Created by Chad Mitchell on 1/20/25.
 //
 #include <random>
+#include <list>
 #include "SimClock.hpp"
 #include "Simulation.hpp"
 
@@ -27,9 +28,7 @@
  *******************************************************************************************
  */
 SimClock::SimClock(Simulation *theSimulation, long endTime):
-        theSimulation{theSimulation}, endTime{endTime}, currentTime{0}, needSort{false} {
-    // initialize our vector of event handlers
-    eventHandlers = std::vector<std::shared_ptr<EventHandler>>();
+theSimulation{theSimulation}, endTime{endTime}, currentTime{0}, needSort{false}, eventHandlers{} {
 }
 SimClock::~SimClock() {
 }
@@ -44,11 +43,16 @@ long SimClock::getTime() {
 void SimClock::addHandler(std::shared_ptr<EventHandler> aHandler) {
     // Keep eventHandlers sorted with soonest time at the end.
     // Insert the new handler into the first location to keep it sorted.
+
+# if SORTED_EVENT_QUEUE_TYPE == 2 // multiset always already sorted
+    eventHandlers.insert(EventHandlerSharedPtr(aHandler));
+#else
     auto handlerPtr = begin(eventHandlers);
     while(handlerPtr != end(eventHandlers) &&  (*handlerPtr)->getNextEventTime() > aHandler->getNextEventTime()) {
         handlerPtr++;
     }
     eventHandlers.insert(handlerPtr, aHandler);
+#endif
 }
 
 // One of our handlers thinks that it may be in the wrong order in the vector due to internal changes.
@@ -57,6 +61,8 @@ void SimClock::addHandler(std::shared_ptr<EventHandler> aHandler) {
 // asks us to do this while responding to a handleEvent() call, we already removed it from the vector
 // before calling handleEvent() and will add it back when that handleEvent() returns so no need to do anyting now.
 void SimClock::reSortHandler(std::shared_ptr<EventHandler> aHandler) {
+# if SORTED_EVENT_QUEUE_TYPE == 2 // multiset always already sorted
+    // But if the value of handler's nextEventTime changed, it needs to be resorted
     auto handlerPtr = begin(eventHandlers);
     while(handlerPtr != end(eventHandlers)) {
         if(*handlerPtr == aHandler) {
@@ -66,6 +72,34 @@ void SimClock::reSortHandler(std::shared_ptr<EventHandler> aHandler) {
         }
         handlerPtr++;
     }
+    std::cout << "***error: tried to resort aHandler, but not found in eventHandler list" << std::endl;
+    std::cout << "aHandler:" << aHandler->describe() << std::endl;
+#else
+#if 1 // use find instead of manual search
+    auto handlerPtr = find_if(begin(eventHandlers),end(eventHandlers),
+                              [aHandler](std::shared_ptr<EventHandler> aHandlerPtr)
+                              {return aHandlerPtr == aHandler;});
+    if(*handlerPtr == aHandler) {
+        eventHandlers.erase(handlerPtr);
+        addHandler(aHandler);
+    } else {
+        std::cout << "***error: tried to resort aHandler, but not found in eventHandler list" << std::endl;
+        std::cout << "aHandler:" << aHandler->describe() << std::endl;
+    }
+#else
+    auto handlerPtr = begin(eventHandlers);
+    while(handlerPtr != end(eventHandlers)) {
+        if(*handlerPtr == aHandler) {
+            eventHandlers.erase(handlerPtr);
+            addHandler(aHandler);
+            return;
+        }
+        handlerPtr++;
+    }
+    std::cout << "***error: tried to resort aHandler, but not found in eventHandler list" << std::endl;
+    std::cout << "aHandler:" << aHandler->describe() << std::endl;
+#endif
+#endif
 }
 
 // Set internal variable indicating that we need to resort the vector at the start of the next iteration of the run loop
@@ -78,22 +112,40 @@ void SimClock::markNeedSort()
 
 // For testing: check if the vector is properly sorted
 bool SimClock::checkSort() {
+# if SORTED_EVENT_QUEUE_TYPE == 2 // multiset always already sorted
+    return true;
+#else
     return is_sorted(begin(eventHandlers), end (eventHandlers), [](std::shared_ptr<EventHandler> lhs, std::shared_ptr<EventHandler> rhs) {
         return lhs->getNextEventTime() > rhs->getNextEventTime();
     });
+#endif
 }
 
 // Sort the vector of handlers
 // This function is private so only this object can call it at times that are safe
 void SimClock::sortHandlers() {
+#if SORTED_EVENT_QUEUE_TYPE == 0
     sort(begin(eventHandlers), end (eventHandlers), [](std::shared_ptr<EventHandler> lhs, std::shared_ptr<EventHandler> rhs) {
         return lhs->getNextEventTime() > rhs->getNextEventTime();
     });
+#else // SORTED_EVENT_QUEUE_TYPE == 1 so Use a sort that works for lists and vactors
+
+#if SORTED_EVENT_QUEUE_TYPE == 1
+    eventHandlers.sort([](std::shared_ptr<EventHandler> lhs, std::shared_ptr<EventHandler> rhs) {
+        return lhs->getNextEventTime() > rhs->getNextEventTime();
+    });
+#else // SORTED_EVENT_QUEUE_TYPE == 2     // Already always sort
+#endif
+
+#endif
 }
 
 // Run the actual simulation
 bool SimClock::run(bool verbose) {
 
+#if 0 // Use this to force verbose for special testing situations
+    verbose = true
+#endif
     // Decide if we need to share progress status
     long nextProgressUpdate = LONG_MAX; // default is never do a progress update
     long progressInterval = 0; // How often do we show progress (<= 0 means do not show it)
@@ -109,11 +161,26 @@ bool SimClock::run(bool verbose) {
     while(!eventHandlers.empty()) {
         // If some other object has indicate that we may need to sort, this is a safe time to do it
         if(needSort) {
+            if(verbose) {
+                std::cout << std::endl;
+                std::cout << "'needSort == true' in simCLock event loop so listing pre-sort status first." << std::endl;
+                describeQueue(currentTime);
+            }
             sortHandlers();
             needSort = false;
         }
+        if(verbose) {
+            std::cout << std::endl;
+            describeQueue(currentTime);
+        }
         // Pull the handler with the lowest next time off the end of the list (kept sorted that way)
+#if SORTED_EVENT_QUEUE_TYPE == 2
+        auto endPtr = eventHandlers.end();
+        endPtr--;
+        std::shared_ptr<EventHandler> nextEventHandler = endPtr->theHandler;
+#else
         std::shared_ptr<EventHandler> nextEventHandler = eventHandlers.back();
+#endif
         long nextTime = nextEventHandler->getNextEventTime();
         if(currentTime> nextTime) {
             // This should never happen so indiate there was a problem we need to fix
@@ -148,7 +215,12 @@ bool SimClock::run(bool verbose) {
             break;
         }
         // Advance the current time
+#if SORTED_EVENT_QUEUE_TYPE == 2
+        // We already got the pointer to the last item (the one we just processed)earlier
+        eventHandlers.erase(endPtr);
+#else
         eventHandlers.pop_back();
+#endif
         if(nextTime > currentTime && verbose) {
             std::cout << std::endl;
             std::cout << "Advancing time to " << nextTime << std::endl;
@@ -190,6 +262,15 @@ bool SimClock::run(bool verbose) {
         std::cout << std::endl;
     }
     // Close out remaining handlers
+#if SORTED_EVENT_QUEUE_TYPE == 2
+    for(EventHandlerSharedPtr remainingEventHandler: eventHandlers) {
+        if(verbose) {
+            std::cout << "Close out handleEvent() for " << remainingEventHandler.theHandler->describe() << std::endl;
+        }
+        // Notify them that this is the final close-out in case they need to do something different
+        remainingEventHandler.theHandler->handleEvent(currentTime, true);
+    }
+#else
     for(std::shared_ptr<EventHandler> remainingEventHandler: eventHandlers) {
         if(verbose) {
             std::cout << "Close out handleEvent() for " << remainingEventHandler->describe() << std::endl;
@@ -197,6 +278,7 @@ bool SimClock::run(bool verbose) {
         // Notify them that this is the final close-out in case they need to do something different
         remainingEventHandler->handleEvent(currentTime, true);
     }
+#endif
     return true;
 }
 
@@ -205,12 +287,39 @@ bool SimClock::run(bool verbose) {
 // never in more than one place at the same time.
 long SimClock::countPlanes() {
     long returnValue = 0;
+#if SORTED_EVENT_QUEUE_TYPE == 2
+    for(auto aHandlerPtr: eventHandlers) {
+        auto aHandler = aHandlerPtr.theHandler;
+        returnValue += aHandler->countPlanes();
+    }
+#else
     for(auto aHandler: eventHandlers) {
         returnValue += aHandler->countPlanes();
     }
+#endif
     return returnValue;
 }
 
+// For testing: describe detailed current state of the vector.
+// This is more detailed than the override of the generic describe method
+// While describe() gives counts of planes, this lists the handlers.
+void SimClock::describeQueue(long currentTime) {
+    std::cout << "*** SimClock eventHandler list at " << currentTime << std::endl;
+    // List the planes waitint
+    if(eventHandlers.size() == 0) {
+        std::cout << "No eventHandlers in SimClock" << std::endl;
+   } else {
+#if SORTED_EVENT_QUEUE_TYPE == 2
+    for(auto aHandlerPtr: eventHandlers) {
+        auto aHandler = aHandlerPtr.theHandler;
+#else
+        for(auto aHandler: eventHandlers) {
+#endif
+           std::cout << "    " << aHandler->describe() << " having next event time " << aHandler->getNextEventTime() << std::endl;
+        }
+    }
+    std::cout << std::endl;
+}
 
 // These are constants to use in the test event handlers
 const int maxRangeDelay{20}; // Test event handlers will delay in a range [2 - maxRangeDelay] seconds after each event
@@ -232,11 +341,10 @@ std::uniform_int_distribution<> distribTestHandlerRepeat(1, maxTestHandlerRepeat
  */
 class TestHandler: public EventHandler {
     long repeats; // How many events does this process?
-    long handlerID; // A unique identification for output
 public:
-    TestHandler(): EventHandler(LONG_MAX), repeats{1}, handlerID{0}   {
+    TestHandler(): EventHandler(LONG_MAX), repeats{1}   {
     };
-    TestHandler(long nextEventTime, int repeatCount, long handlerID): EventHandler(nextEventTime),repeats{repeatCount},handlerID{handlerID}  {
+    TestHandler(long nextEventTime, int repeatCount): EventHandler(nextEventTime),repeats{repeatCount}  {
     };
     virtual ~TestHandler() override {
     };
@@ -245,20 +353,22 @@ public:
     virtual bool handleEvent(long currentTime, bool closeOut) override {
         // Inform the user that this handler is processing an event.
         if(currentTime < nextEventTime) {
-            std::cout << "Test Handler #" << handlerID << " ended early at " << currentTime << " wanted " << nextEventTime << std::endl;
+            std::cout << "Wanted " << nextEventTime << " but ended early at " << currentTime << " for " << describe() << std::endl;
         } else {
-            std::cout << "Test Event for Handler #" << handlerID << " at " << currentTime << std::endl;
+            std::cout << "Handle event at " << currentTime << " for " << describe() << std::endl;
         }
         // If we are done, ask that we be removed from the list of active event handlers
         if(--repeats <= 0) { return false; }
         // Get a delay for the next event we want to handle
+        // Set a next Event time
         nextEventTime = currentTime + distribTestHandlerDelay(genTestHandler);
         return true;
     }
     
-    // Descrobe this handler, required of all children of EventHandler
+    // Describe this handler, required of all children of EventHandler
     virtual const std::string describe() override {
-        std::string description = "Test EventHandler";
+        std::string description = "Test EventHandler #" + std::to_string(getHandlerNumber()) +" with " +
+        std::to_string(repeats) + " repeats remaining and next event at " + std::to_string(nextEventTime);
         return description;
     }
 };
@@ -276,8 +386,10 @@ bool testSimClock(bool longTest) {
     // Construct and add the test event handlers
     for(int i=0; i<testHandlerCount; i++) {
         aClock.addHandler(std::make_shared<TestHandler>(distribTestHandlerDelay(genTestHandler),
-                                                        distribTestHandlerRepeat(genTestHandler),i + 1));
+                                                        distribTestHandlerRepeat(genTestHandler)));
     }
+    // List the contents of the SimClock
+    aClock.describeQueue(0);
     // Run the test
     bool returnValue = aClock.run(true);
     std::cout << std::endl;

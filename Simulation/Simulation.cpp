@@ -38,12 +38,14 @@ std::vector<FinalStats> Simulation::run(bool verbose)
 {
     // Start a timer so we can report how long it takes to run
     auto startTimer = std::chrono::high_resolution_clock::now();
-    theSimClock = std::make_shared<SimClock>(this, theSettings->simulationDuration);
  
     // Set up the environment
     theChargerQueue = std::make_shared<ChargerQueue>(this, theSettings->chargerCount);
     thePlaneQueue = std::make_shared<PlaneQueue>(this);
-    thePlaneQueue->generatePlanes(theSimClock->getTime(), theSettings->planeCount, theSettings->minPlanePerKind, theSettings->maxPassengerDelay);
+    thePlaneQueue->generatePlanes(0, theSettings->planeCount, theSettings->minPlanePerKind, theSettings->maxPassengerDelay);
+    // Don't set up theSimClock until after the planes are generated so thePlaneQueue does not
+    // resort itself after inserting each plan with a different wait time
+    theSimClock = std::make_shared<SimClock>(this, theSettings->simulationDuration);
     theSimClock->addHandler(theChargerQueue);
     theSimClock->addHandler(thePlaneQueue);
     

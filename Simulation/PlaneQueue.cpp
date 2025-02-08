@@ -54,14 +54,20 @@ bool PlaneQueue::handleEvent(long currentTime, bool closeOut) {
         std::cout << std::endl;
         return false;
     }
-    while(!planesWaiting.empty() && planesWaiting.back().nextFlightTime <= currentTime) {
+    while(!planesWaiting.empty() && lastPlane().nextFlightTime <= currentTime) {
         // While we have any plane that is ready to fly and has hit its assigned passenger wait time,
         // remove it from the wait queue and put it into a new flight.
         // First, get the next plane ready to go. Planes with equal nextFlightTime are stored so they
         // will be handled FIFO.
-        std::shared_ptr<Plane> thePlane = planesWaiting.back().thePlane;
+        std::shared_ptr<Plane> thePlane = lastPlane().thePlane;
         // Remove the plane from the queue because it will be handed to a Flight object
+#if SORTED_PLANE_QUEUE_TYPE == 2
+        auto endPtr = planesWaiting.end();
+        endPtr--;
+        planesWaiting.erase(endPtr);
+#else
         planesWaiting.pop_back();
+#endif
         if(theSimulation && theSimulation->theSimClock) {
             // Create a flight object containing the plane and add it to theSimClock
             theSimulation->theSimClock->addHandler(std::make_shared<Flight>(theSimulation,
@@ -75,8 +81,8 @@ bool PlaneQueue::handleEvent(long currentTime, bool closeOut) {
         // No planes waiting now so keep us in SimClock, but do not pass events to us until something changes
         nextEventTime = LONG_MAX;
     } else  {
-        // Updaate our next time to the plane at the back of the vector (the next one that will be ready)
-        nextEventTime = planesWaiting.back().nextFlightTime;
+        // Update our next time to the plane at the back of the vector (the next one that will be ready)
+        nextEventTime = lastPlane().nextFlightTime;
     }
     return true;
 }
@@ -88,6 +94,10 @@ long PlaneQueue::countPlanes() {
 
 // For testing: describe the object and the count od planes in the object
 const std::string PlaneQueue::describe() {
+#if 0 // for extra testing
+    verboseTesting = true;
+    describeQueue((theSimulation && theSimulation->theSimClock) ? theSimulation->theSimClock->getTime() : 0);
+#endif
     std::string description = "Plane Queue containing " + std::to_string(countPlanes()) + " planes";
     return description;
 }
@@ -103,23 +113,32 @@ bool PlaneQueue::isEmpty() {
 // After adding the plane during a handleEvent cycle, if it is immediatley ready
 // the handleEvent function will notice that and move it to a Flight. If outside
 // our own handleEvent function then it would be put into a flight when it is next called.
-void PlaneQueue::addPlane(long delayUntil, std::shared_ptr<Plane> aPlane) {
+// If we are called from the theChargerQueue eventHandler, optimize by not trying to resort
+// theChargerQueue in the event queue because it will be reinserted into the right place
+// after the eventHandler completes.
+
+void PlaneQueue::addPlane(long delayUntil, std::shared_ptr<Plane> aPlane, bool fromEventHandler) {
     if(verboseTesting) {
         std::cout << "Adding " << aPlane->describe() << " with delay until " << delayUntil << std::endl;
     }
     // Keep planes sorted with soonest ready time at the end.
+# if SORTED_PLANE_QUEUE_TYPE == 2 // multiset always already sorted
+    PlaneQueueItem queueItem = PlaneQueueItem{aPlane, delayUntil};
+    planesWaiting.insert(queueItem);
+#else
     auto planePtr = begin(planesWaiting);
     while(planePtr != end(planesWaiting) &&  planePtr->nextFlightTime > delayUntil) {
         planePtr++;
     }
     PlaneQueueItem queueItem = PlaneQueueItem{aPlane, delayUntil};
     planesWaiting.insert(planePtr, queueItem);
-    
+#endif
     // if our nextFlightTime time has changed, we need to be resorted in the SimClock
-    if(nextEventTime != planesWaiting.back().nextFlightTime) {
-        nextEventTime = planesWaiting.back().nextFlightTime; // adjust the next time for our queue
-        if(theSimulation && theSimulation->theSimClock && theSimulation->thePlaneQueue) {
-            theSimulation->theSimClock->reSortHandler(theSimulation->thePlaneQueue);
+    // If we are from PlaneQueue.eventHandler, we will be resorted after the handler so no need to do it now
+    if(nextEventTime > queueItem.nextFlightTime) {
+        nextEventTime = queueItem.nextFlightTime;
+        if(!fromEventHandler && theSimulation && theSimulation->theSimClock && theSimulation->thePlaneQueue) {
+                theSimulation->theSimClock->reSortHandler(theSimulation->thePlaneQueue);
         }
     }
 
@@ -176,8 +195,16 @@ void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachComp
         // set up this plane's wait for passengers
         long waitForPassengers = Passenger::getPassengerDelay(maxPassengerDelay);
         // actually add the random plane
-        addPlane(waitForPassengers, std::make_shared<Plane>(planeSpecifications[thisChoice]));
+        addPlane(waitForPassengers, std::make_shared<Plane>(planeSpecifications[thisChoice]), false);
     }
+#if !(SORTED_PLANE_QUEUE_TYPE == 2)
+    // Make sure the plane list is sorted
+    if(!is_sorted(begin(planesWaiting), end (planesWaiting), [](PlaneQueueItem lhs, PlaneQueueItem rhs) {
+        return lhs.nextFlightTime > rhs.nextFlightTime;
+    })) {
+        std::cout << "***error: Plane queue is not sorted after adding planes." << std::endl;
+    }
+#endif
 }
 
 // For testing: remove the next Plane ready from the vector independent of timing
@@ -187,6 +214,12 @@ std::shared_ptr<Plane> PlaneQueue::removeNextPlane() {
         // no planes to remove
         return nullptr;
     }
+#if SORTED_PLANE_QUEUE_TYPE == 2
+    auto endPtr = planesWaiting.end();
+    endPtr--;
+    std::shared_ptr<Plane> returnValue = endPtr->thePlane;
+    planesWaiting.erase(endPtr);
+#else
     // Get a pointer to the plane and remove it from this object
     std::shared_ptr<Plane> returnValue = planesWaiting.back().thePlane;
     planesWaiting.pop_back();
@@ -198,6 +231,7 @@ std::shared_ptr<Plane> PlaneQueue::removeNextPlane() {
             theSimulation->theSimClock->reSortHandler(theSimulation->thePlaneQueue);
         }
     }
+#endif
     return returnValue;
 }
 
