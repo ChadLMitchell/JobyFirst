@@ -66,10 +66,10 @@ void outputResults(std::vector<FinalStats> results)
     // Display a header with two row column names
     cout << left << setw(17) << "Company"
     << left << setw(9) << "Total "
-    << left << setw(13) << "Avgerage "
-    << left << setw(14) << "Avgerage "
+    << left << setw(13) << "Average "
+    << left << setw(14) << "Average "
     << left << setw(9) << "Total  "
-    << left << setw(13) << "Avgerage "
+    << left << setw(13) << "Average "
     << left << setw(17) << "Average Charge "
     << left << setw(8) << "Total "
     << left << setw(15) << "Total"
