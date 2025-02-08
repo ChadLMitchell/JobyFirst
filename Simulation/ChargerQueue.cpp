@@ -204,7 +204,7 @@ void ChargerQueue::describeQueues(long currentTime) {
             WaitingPlane aWaitingPlane = planesWaiting.front();
             planesWaiting.pop();
             std::cout << "    " << "Waiting " << currentTime - aWaitingPlane.timeStarted
-            << " seconds: " << aWaitingPlane.thePlane->describe() << std::endl;
+            << (secondsPerMinute == 60 ? " seconds: " : " minutes: ") << aWaitingPlane.thePlane->describe() << std::endl;
             tempPlanes.push_back(aWaitingPlane);
         }
         // restore planes to tempQueue

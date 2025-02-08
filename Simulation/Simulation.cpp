@@ -156,7 +156,8 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     
     // Output a short summary of the overall simulation.
     // We let the caller output the more detailed statistics.
-    std::cout << "Final simulated time: " << theSimClock->getTime() << " seconds (" <<
+    std::cout << "Final simulated time: " << theSimClock->getTime() <<
+    (secondsPerMinute == 60 ? " seconds (" : " minutes (") <<
     theSimClock->getTime()/(secondsPerHourD) << " hours)" << std::endl;
     std::cout << totalFlights << " flights and " << totalCharges << " charges" << std::endl;
     std::cout << std::endl;

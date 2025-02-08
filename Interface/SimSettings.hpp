@@ -15,6 +15,15 @@
 
 // These are used to help us convert from hours and minutes to seconds
 const long secondsPerMinute{60}; // Converting seconds to minutes and minutes to seconds
+// Despite labels still saying "seconds", changing this allows using a minute based clock
+// secondsPerMinute == 60: clock granularity is seconds
+// secondsPerMinute == 1: clock granularity is minutes
+// Other examples:
+// secondsPerMinute == 2: clock granularity is half minutes (30 seconds)
+// secondsPerMinute == 10: clock granularity is 6 seconds
+// secondsPerMinute == 30: clock granularity is 2 seconds
+// The user output automatically adjusts if you set this to 60 or to 1, but otherwise is incorrect
+
 const long secondsPerHour{secondsPerMinute * 60}; // Converting seconds to hours and hours to seconds
 const double secondsPerHourD{secondsPerMinute * 60.0}; // For floating point calcuations
 const long defaultTestClockSeconds{secondsPerHour * 3}; //3 hours

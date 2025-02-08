@@ -60,7 +60,11 @@ bool setMinimumPlaneOption(int selector, MenuGroup &thisMenuGroup) {
 // Get input from the user for the value for currentSettings.simulationDuration
 bool setDuration(int selector, MenuGroup &thisMenuGroup) {
     if(selector == 4) {
-        currentSettings.simulationDuration = thisMenuGroup.getNumberFromUser("Input Simulation duration (in seconds): ");
+        if(secondsPerMinute == 60) {
+            currentSettings.simulationDuration = thisMenuGroup.getNumberFromUser("Input Simulation duration (in seconds): ");
+        } else {
+            currentSettings.simulationDuration = thisMenuGroup.getNumberFromUser("Input Simulation duration (in minutes): ");
+        }
     } else {
         currentSettings.simulationDuration = thisMenuGroup.getNumberFromUser("Input Simulation duration (in hours): ") * secondsPerHour;
     }
@@ -120,11 +124,18 @@ vector<MenuItem> settingsMenus {
     MenuItem('8', string{"Set Fault Option"}, &setFaultOption, 8),
     MenuItem('M', string{"Return to Main Menu"}, &returnToMainMenu, 0)
 };
+MenuItem secondsMenuItem{MenuItem('4', string{"Change Simulation Duration (in Seconds)"}, &setDuration, 4)};
+MenuItem minutesMenuItem{MenuItem('4', string{"Change Simulation Duration (in Minutes)"}, &setDuration, 4)};
 MenuGroup settingsMenu = MenuGroup(settingsMenus);
 
 // This is the only external entry point to this file that is called when we want to display
 // and use the manage the settings menu.
 bool editSettings(int selector, MenuGroup &thisMenuGroup) {
+    if(secondsPerMinute == 60) {
+        settingsMenus[3] = secondsMenuItem;
+    } else {
+        settingsMenus[3] = minutesMenuItem;
+    }
     debugMessage("===> Selected Edit Settings");
     settingsMenu.runMenu();
     return false;

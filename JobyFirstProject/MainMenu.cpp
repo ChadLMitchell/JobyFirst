@@ -30,7 +30,7 @@ extern SimSettings currentSettings;
 void outputSettings(const SimSettings &s)
 {
     cout << "Simulation Settings:" << endl;
-    cout << "Duration: " << s.simulationDuration << " seconds" << endl;
+    cout << "Duration: " << s.simulationDuration << (secondsPerMinute == 60 ? " seconds" : " minutes") << endl;
     cout << "Using " << s.chargerCount << " chargers and "  << s.planeCount << " planes" << endl;
     cout << "Minimum planes per kind: " << s.minPlanePerKind << endl;
     cout << "Passenger Count Option: "
