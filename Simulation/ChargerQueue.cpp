@@ -296,7 +296,7 @@ bool testChargerQueueLong() {
 }
 
 // This does a shorter test of the ChargerQueue class. It collects informataion about the status and actions of the object into an vector
-// as it "simulates" being part of a simulation as it "simulates" being part of a simulation.
+// as it "simulates" being part of a simulation.
 // For now this then outputs to cout a summary of the results, but later we could do more automated
 // testing using expected values of the result vector for known inputs.
 bool testChargerQueueShort() {
@@ -315,7 +315,7 @@ bool testChargerQueueShort() {
         aQueue.addPlane(currentTime, aPlane, false);
     }
 
-    // Get the current status of the plans in a vector
+    // Get the current status of the planes in a vector
     std::vector<ChargerQueueStatusItem> queueStatus = aQueue.getQueueStatus();
     bool doingOnChargers = true;
     

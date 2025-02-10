@@ -21,7 +21,7 @@
 /*
  *******************************************************************************************
  * class Passenger
- * This virtual class provides access to two routines that manage passenger information.
+ * This virtual class provides access to two static functions that manage passenger information.
  * If there is later a need to model passenger behavior, this could become a regular class.
  *******************************************************************************************
  */
