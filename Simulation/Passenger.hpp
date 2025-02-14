@@ -13,9 +13,9 @@
 #include <queue>
 #include <string>
 #include <iostream>
-#include <random>
 
 #include "SimSettings.hpp"
+#include "Simulation.hpp"
 
 
 /*
@@ -28,17 +28,15 @@
 class Passenger {
     Passenger() = delete;
 
-    static std::random_device a_random_device;
-    static std::mt19937 generator;
 public:
     // This provides the number of passengers on a flight. It takes the maximum number
     // and the settings and determines if it should return that maximum number or a
     // random number between 1 and the maximum.
-    static long getPassengerCount(long maxPassengers, std::shared_ptr<SimSettings> theSettings);
+    static long getPassengerCount(Company aCompany, Simulation *theSimulation);
 
     // This determines how long a delay there will be for a particular flight.
     // Depending on the settings it may return 0 delay or some random delay
-    static long getPassengerDelay(long maxPassengerDelay);
+    static long getPassengerDelay(long maxPassengerDelay, Simulation *theSimulation);
 };
 
 #endif /* Passenger_hpp */

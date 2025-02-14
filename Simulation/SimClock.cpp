@@ -4,10 +4,10 @@
 //
 //  Created by Chad Mitchell on 1/20/25.
 //
-#include <random>
 #include <list>
 #include "SimClock.hpp"
 #include "Simulation.hpp"
+#include "RandomGenerators.hpp"
 
 /*
  *******************************************************************************************
@@ -321,17 +321,6 @@ void SimClock::describeQueue(long currentTime) {
     std::cout << std::endl;
 }
 
-// These are constants to use in the test event handlers
-const int maxRangeDelay{20}; // Test event handlers will delay in a range [2 - maxRangeDelay] seconds after each event
-const int maxTestHandlerRepeat{20}; // Ech test event handler will be asked to process [1 - maxTestHandlerRepeat] events
-const int longTestHandlerCount{25}; // How many test handlers are created for a long test?
-const int shortTestHandlerCount{5}; // How many test handlers are created for a short test?
-
-// Set up a random number generator and some distributions for the SimClock tests
-std::random_device rdTestHandler;
-std::mt19937 genTestHandler(useRandomSeed ? useRandomSeed : rdTestHandler());
-std::uniform_int_distribution<> distribTestHandlerDelay(2, maxRangeDelay);
-std::uniform_int_distribution<> distribTestHandlerRepeat(1, maxTestHandlerRepeat);
 
 /*
  *******************************************************************************************
@@ -341,10 +330,10 @@ std::uniform_int_distribution<> distribTestHandlerRepeat(1, maxTestHandlerRepeat
  */
 class TestHandler: public EventHandler {
     long repeats; // How many events does this process?
+    std::mt19937 *theGenerator;
+    std::uniform_int_distribution<> *theDistribution;
 public:
-    TestHandler(): EventHandler(LONG_MAX), repeats{1}   {
-    };
-    TestHandler(long nextEventTime, int repeatCount): EventHandler(nextEventTime),repeats{repeatCount}  {
+    TestHandler(long nextEventTime, int repeatCount, std::mt19937 *aGenerator, std::uniform_int_distribution<> *aDistribution): EventHandler(nextEventTime),repeats{repeatCount}, theGenerator{aGenerator},theDistribution{aDistribution}   {
     };
     virtual ~TestHandler() override {
     };
@@ -361,7 +350,7 @@ public:
         if(--repeats <= 0) { return false; }
         // Get a delay for the next event we want to handle
         // Set a next Event time
-        nextEventTime = currentTime + distribTestHandlerDelay(genTestHandler);
+        nextEventTime = currentTime + (*theDistribution)(*theGenerator);
         return true;
     }
     
@@ -375,8 +364,20 @@ public:
 
 // Test the way SimClock processes events
 bool testSimClock(bool longTest) {
+    // These are constants to use in the test event handlers
+    const int maxRangeDelay{20}; // Test event handlers will delay in a range [2 - maxRangeDelay] seconds after each event
+    const int maxTestHandlerRepeat{20}; // Ech test event handler will be asked to process [1 - maxTestHandlerRepeat] events
+    const int longTestHandlerCount{25}; // How many test handlers are created for a long test?
+    const int shortTestHandlerCount{5}; // How many test handlers are created for a short test?
+
     std::cout << "***** Starting Test of SimClock Class *****" << std::endl;
     
+    // Set up a random number generator and some distributions for the SimClock tests
+    RandomGenerators theRandomGenerators(nullptr);
+    std::mt19937 *theGenerator = theRandomGenerators.getGenerator(); // cache this since we use it repeatedly
+    std::uniform_int_distribution<> distribTestHandlerDelay(2, maxRangeDelay);
+    std::uniform_int_distribution<> distribTestHandlerRepeat(1, maxTestHandlerRepeat);
+
     // Create a SimClock object
     // For a long test run the clock for the default duration (3 hours) which produces a lot of output
     // For a short test run the clock for one minute of simulated time
@@ -385,8 +386,8 @@ bool testSimClock(bool longTest) {
     int testHandlerCount = longTest ? longTestHandlerCount : shortTestHandlerCount;
     // Construct and add the test event handlers
     for(int i=0; i<testHandlerCount; i++) {
-        aClock.addHandler(std::make_shared<TestHandler>(distribTestHandlerDelay(genTestHandler),
-                                                        distribTestHandlerRepeat(genTestHandler)));
+        aClock.addHandler(std::make_shared<TestHandler>(distribTestHandlerDelay(*theGenerator),
+                                                        distribTestHandlerRepeat(*theGenerator), theGenerator, &distribTestHandlerDelay));
     }
     // List the contents of the SimClock
     aClock.describeQueue(0);

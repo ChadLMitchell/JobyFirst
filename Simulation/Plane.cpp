@@ -8,6 +8,7 @@
 #include <random>
 #include "Plane.hpp"
 #include "Passenger.hpp"
+#include "RandomGenerators.hpp"
 
 // We would eventually put the plane specifications into their own object to manage them
 // for now, they are here. Later, in their own object, we could add the abilty to read them from a file.
@@ -50,7 +51,7 @@ PlaneSpecification planeSpecifications[]{
 
 // Each plane is assigned a plane number (mostly for testing)
 int Plane::NextPlaneNumber = 1; // We use this static member to keep track of next number to assign
-Plane::Plane(PlaneSpecification &spec): mySpecs(spec) {
+Plane::Plane(PlaneSpecification &spec, std::shared_ptr<RandomGenerators> aRandomGenerators): mySpecs(spec), theRandomGenerators{aRandomGenerators} {
     // To aoid divide by 0 and other silly errors
     // we should validate specs before creating Plane, this is extra checking
     if(!validateSpecs(mySpecs)) {
@@ -145,11 +146,17 @@ long Plane::decrementNextFaultInterval(long seconds) {
 // It works because the fault per hour probabiilty is still honored across the population as long
 // as every plane is assigned the an intervaly according to the right random distribution.
 long Plane::createFaultInterval() {
-    std::random_device rd;
-    std::mt19937 gen(useRandomSeed ? useRandomSeed : rd());
-    // First generate a random real number between 0 and 1
-    std::uniform_real_distribution<> distrib(0, 1);
-    double random0to1 = distrib(gen);
+    double random0to1 = 0.5;
+    if(theRandomGenerators) {
+        random0to1 = theRandomGenerators->getRandomRange0to1();
+    } else {
+        std::random_device rd;
+        std::mt19937 gen(useRandomSeed ? useRandomSeed : rd());
+        // First generate a random real number between 0 and 1
+        std::uniform_real_distribution<> distrib(0, 1);
+        random0to1 = distrib(gen);
+    }
+    
     // We then take the ln (natural logarithm) of that number and divide it by the fault rate
     // But ln(0) is infinity so we avoid the occasional very small number
     if (random0to1 < 0.001) { random0to1 = 0.001; };
@@ -197,9 +204,12 @@ bool Plane::validateSpecs(PlaneSpecification &spec) {
 
 // Generate a plane randomly from the kids allowed. This is only used for testing
 // and does not take into account the minPlanePerKind setting
-std::shared_ptr<Plane> Plane::getRandomPlane() {
-    Company randCompany = allCompany[rand() % (maxCompany + 1)];
-    return std::make_shared<Plane>(planeSpecifications[randCompany]);
+std::shared_ptr<Plane> Plane::getRandomPlane(std::shared_ptr<RandomGenerators> aRandomGenerator) {
+    Company randCompany = Alpha;
+    if(aRandomGenerator) {
+        randCompany = aRandomGenerator->getRandomCompany();
+    }
+    return std::make_shared<Plane>(planeSpecifications[randCompany], aRandomGenerator);
 }
 
 // This tests some functionality of the Plane class. The main thing is to validate the approach to fault distribution produces valid results.
@@ -223,7 +233,8 @@ bool testPlaneClassObjects(bool verbose) {
             returnValue = false;
         } else {
             double accumFaultCount = 0; // this will accumulate a total of all fault intervals generated
-            Plane testPlane {Plane(aSpec)}; // Get a plane
+            std::shared_ptr<RandomGenerators> theRandomGenerators = std::make_shared<RandomGenerators>(nullptr);
+            Plane testPlane {Plane(aSpec, theRandomGenerators)}; // Get a plane
             for (auto tryCount = 0; tryCount < tries; tryCount++) {
                 accumFaultCount += testPlane.createFaultInterval(); // Recreate its fault interval "tries" times
             }

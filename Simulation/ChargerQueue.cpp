@@ -91,7 +91,7 @@ bool ChargerQueue::handleEvent(long currentTime, bool closeOut) {
             // Add the plane to the plane queue, ready to fly, asking a static Passenger class function to assign an actual
             // delay for this plane at this time. If maxPassengerDelay > 0 it will be set to some value in [0 - maxPassengerDelay].
             // Pass false because we are calling PlaneQueue.addPlane() from ChargerQueue.handleEvent, not from PlaneQueue.handleEvent
-            theSimulation->thePlaneQueue->addPlane(currentTime + Passenger::getPassengerDelay(maxPassengerDelay),thePlane, false);
+            theSimulation->thePlaneQueue->addPlane(currentTime + Passenger::getPassengerDelay(maxPassengerDelay, theSimulation),thePlane, false);
         } else if(verboseTesting) {
             // if we are not in a simulation and are being verbose, mention what we would have done if we could
             std::cout << "Would add flight for " << thePlane->describe() << "to thePlaneQueue if Sim full simulation" << std::endl;
@@ -271,12 +271,13 @@ bool testChargerQueueLong() {
     bool returnValue = true;
     long currentTime = 0;
     
+    std::shared_ptr<RandomGenerators> someRandomGenerators = std::make_shared<RandomGenerators>(nullptr);
     // Create a ChargerQueue object
     ChargerQueue aQueue(nullptr, testChargers);
     std::cout << " ***** Starting long test of ChargerQueue Class  *****" << std::endl;
     // Add some planes to the object
     for(auto i=0; i<testPlanes; i++){
-        std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
+        std::shared_ptr<Plane> aPlane = Plane::getRandomPlane(someRandomGenerators);
         std::cout << "Adding " << aPlane->describe() << std::endl;
         aQueue.addPlane(currentTime, aPlane, false);
     }
@@ -305,13 +306,14 @@ bool testChargerQueueShort() {
 
     bool returnValue = true;
     long currentTime = 0;
+    std::shared_ptr<RandomGenerators> someRandomGenerators = std::make_shared<RandomGenerators>(nullptr);
     // Create a ChargerQueue object
     ChargerQueue aQueue(nullptr, testChargers);
     aQueue.setVerboseTesting(true);
     std::cout << " ***** Starting short test of ChargerQueue Class  *****" << std::endl;
     // Add some planes to the object
     for(auto i=0; i<testPlanes; i++){
-        std::shared_ptr<Plane> aPlane = Plane::getRandomPlane();
+        std::shared_ptr<Plane> aPlane = Plane::getRandomPlane(someRandomGenerators);
         aQueue.addPlane(currentTime, aPlane, false);
     }
 

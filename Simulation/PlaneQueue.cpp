@@ -25,11 +25,11 @@ extern PlaneSpecification planeSpecifications[];
  * For testing, a PlaneQueue may have a nullptr for theSimulation property.
  *******************************************************************************************
  */
-PlaneQueue::PlaneQueue(Simulation *theSimulation):
+PlaneQueue::PlaneQueue(Simulation *theSimulation, std::shared_ptr<RandomGenerators> theRandomGenerators):
 // Set our nextEventTime initially to LONG_MAX so we can be in the SimClock handler list, but
 // not receive events until something happens to activate us such as adding planes that
 // are ready to fly.
-EventHandler(LONG_MAX),theSimulation{theSimulation}, verboseTesting{}, planesWaiting{} {
+EventHandler(LONG_MAX),theSimulation{theSimulation}, theRandomGenerators{theRandomGenerators}, verboseTesting{}, planesWaiting{} {
 }
 PlaneQueue::~PlaneQueue() {
 }
@@ -71,7 +71,7 @@ bool PlaneQueue::handleEvent(long currentTime, bool closeOut) {
         if(theSimulation && theSimulation->theSimClock) {
             // Create a flight object containing the plane and add it to theSimClock
             theSimulation->theSimClock->addHandler(std::make_shared<Flight>(theSimulation,
-              currentTime, Passenger::getPassengerCount(thePlane->getMaxPassengerCount(),theSimulation->theSettings),thePlane));
+                                                                            currentTime, Passenger::getPassengerCount(thePlane->getCompany(),theSimulation),thePlane));
         } else if(verboseTesting) {
             // If testing and being verbose, explain what we would have done if part of an actual simulation.
             std::cout << "Would add flight for " << thePlane->describe() << "to SimClock if full simulation" << std::endl;
@@ -162,7 +162,7 @@ void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachComp
     std::vector<Company> companyChoices(count);
     for(long planesAllocated = 0; planesAllocated < count; planesAllocated++) {
         // Select a random company.
-        long thisCompany = rand() % companyCount;
+        long thisCompany = theRandomGenerators ? theRandomGenerators->getRandomCompany() : rand() % companyCount;
         // As long as we need some minimums, make sure we do those first
         // Otherwise just go with the intial random choice
         if(totalCompanyStillNeeded > 0) {
@@ -193,9 +193,10 @@ void PlaneQueue::generatePlanes(long currentTime, long count, long minOfEachComp
     // We do the actual allocation of planes as a separate step in case we want to add more processing first
     for(long thisChoice: companyChoices) {
         // set up this plane's wait for passengers
-        long waitForPassengers = Passenger::getPassengerDelay(maxPassengerDelay);
+        long waitForPassengers = Passenger::getPassengerDelay(maxPassengerDelay, theSimulation);
         // actually add the random plane
-        addPlane(waitForPassengers, std::make_shared<Plane>(planeSpecifications[thisChoice]), false);
+        addPlane(waitForPassengers, std::make_shared<Plane>(planeSpecifications[thisChoice],
+                                                            theSimulation ? theSimulation->theRandomGenerators : nullptr), false);
     }
 #if !(SORTED_PLANE_QUEUE_TYPE == 2)
     // Make sure the plane list is sorted
@@ -283,7 +284,8 @@ bool testPlaneQueueForWaits() {
 
     bool returnValue = true;
     long currentTime = 0;
-    PlaneQueue aQueue(nullptr);
+    std::shared_ptr<RandomGenerators> theRandomGenerators = std::make_shared<RandomGenerators>(nullptr);
+    PlaneQueue aQueue(nullptr, theRandomGenerators);
     aQueue.setVerboseTesting(true);
     std::cout << " ***** Starting Test of PlaneQueue Waits *****" << std::endl;
     aQueue.generatePlanes(currentTime, testPlanes, ofEachKind, maxWait);
@@ -313,7 +315,8 @@ bool testPlaneQueueForMinimumPerKind() {
         std::cout << "With the minimum of each kind == " << ofEach << ":" << std::endl;
         for(auto repetition = 0; repetition < repeatGenerations; repetition++) {
             // Set up a PlaneQueue and populate it with planes
-            PlaneQueue aQueue(nullptr);
+            std::shared_ptr<RandomGenerators> theRandomGenerators = std::make_shared<RandomGenerators>(nullptr);
+            PlaneQueue aQueue(nullptr, theRandomGenerators);
             aQueue.generatePlanes(currentTime, testPlanes, ofEach, 0);
             // Get the list of planes
             std::vector<PlaneQueueStatusItem> queueStatus = aQueue.getQueueStatus();

@@ -15,7 +15,6 @@
 #include <iostream>
 #include "SimSettings.hpp"
 
-
 /*
  *******************************************************************************************
  * Struct FlightStats
@@ -85,6 +84,7 @@ struct FinalStats {
 class SimClock; // Forward reference since they reference each other
 class ChargerQueue; // Forward reference since they reference each other
 class PlaneQueue; // Forward reference since they reference each other
+class RandomGenerators; // Forward reference since they reference each other
 class Simulation {
    
 protected:
@@ -100,15 +100,14 @@ protected:
     friend class SimClock;
     friend class ChargerQueue;
     friend class PlaneQueue;
+    friend class Flight;
+    friend class RandomGenerators;
     std::shared_ptr<SimClock> theSimClock;
     std::shared_ptr<ChargerQueue> theChargerQueue;
     std::shared_ptr<PlaneQueue> thePlaneQueue;
     // When some of those three classes create any Flight objects, they forward the pointer
     // to this Simulation so it also needs access to the procted members of this class.
-    friend class Flight;
 
-    // Shared settings for this instance of the Simulation
-    std::shared_ptr<SimSettings> theSettings;
 
     // These two vectors are used by the friend classes to accumulate statistics about
     // the run of this Simulation. The Simulation constructor initializes them as empty.
@@ -119,6 +118,10 @@ public:
     Simulation(SimSettings someSettings);
     ~Simulation();
     
+    // Shared settings for this instance of the Simulation
+    std::shared_ptr<SimSettings> theSettings;
+    std::shared_ptr<RandomGenerators> theRandomGenerators;
+
     // This function runs the simulation and returns the results
     std::vector<FinalStats> run(bool verbose);
     

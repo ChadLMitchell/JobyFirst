@@ -28,6 +28,7 @@ Simulation::Simulation(SimSettings someSettings):
 theSimClock{}, theChargerQueue{}, theFlightStats{}, theChargerStats{} {
     // Set up shared pointer to the settings for this simulation
     theSettings = std::make_shared<SimSettings>(someSettings);
+    theRandomGenerators = std::make_shared<RandomGenerators>(this);
 }
 Simulation::~Simulation() {
     
@@ -41,7 +42,7 @@ std::vector<FinalStats> Simulation::run(bool verbose)
  
     // Set up the environment
     theChargerQueue = std::make_shared<ChargerQueue>(this, theSettings->chargerCount);
-    thePlaneQueue = std::make_shared<PlaneQueue>(this);
+    thePlaneQueue = std::make_shared<PlaneQueue>(this, theRandomGenerators);
     thePlaneQueue->generatePlanes(0, theSettings->planeCount, theSettings->minPlanePerKind, theSettings->maxPassengerDelay);
     // Don't set up theSimClock until after the planes are generated so thePlaneQueue does not
     // resort itself after inserting each plan with a different wait time

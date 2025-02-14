@@ -17,6 +17,7 @@
 #include "SimSettings.hpp"
 #include "SimClock.hpp"
 #include "Plane.hpp"
+#include "RandomGenerators.hpp"
 
 /*
  *******************************************************************************************
@@ -68,6 +69,7 @@ struct PlaneQueueStatusItem {
  */
 class PlaneQueue: public EventHandler {
     Simulation *theSimulation; // Simulation object containing current simulation or nullptr
+    std::shared_ptr<RandomGenerators> theRandomGenerators;
     bool verboseTesting; // Option for testing to have the class output action descriptions
     // The following is a vector, not a queue because it is kept soonest at tne end and
     // we can add a Plane to it that has a our of order passengerDelay
@@ -83,7 +85,7 @@ class PlaneQueue: public EventHandler {
 
 #endif
 public:
-    PlaneQueue(Simulation *theSimulation);
+    PlaneQueue(Simulation *theSimulation, std::shared_ptr<RandomGenerators> theRandomGenerators);
     virtual ~PlaneQueue()override;
 
     // As a child of EventHandler, PlaneQueue has a nextEventTime. Each time the SimClock

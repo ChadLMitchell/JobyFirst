@@ -14,6 +14,7 @@
 #include <string>
 #include <iostream>
 #include "SimSettings.hpp"
+#include "RandomGenerators.hpp"
 
 // Specifications provided by the assigned task
 /*
@@ -51,7 +52,7 @@ struct PlaneSpecification {
  */
 class Plane {
     PlaneSpecification mySpecs;
-    
+    std::shared_ptr<RandomGenerators> theRandomGenerators;
     long nextFaultInterval; // Hoe much flight until the next fault?
                             // We assume fault timing happens during flight only
                             // If we complete a flight without triggering the current
@@ -60,7 +61,7 @@ class Plane {
     int planeNumber; // Each plane is assigned a plane number (mostly for testing)
     static int NextPlaneNumber; // Keep track of next number to assign
 public:
-    Plane(PlaneSpecification &spec);
+    Plane(PlaneSpecification &spec, std::shared_ptr<RandomGenerators> aRandomGenerators);
     ~Plane();
 
     // For testing: get the Company enum assigned to this plane
@@ -113,7 +114,7 @@ public:
     // For testing: get a random plane for testing
     // Note that thePlaneQueue directly creates the Plane
     // Objects in a simualtion when it starts.
-    static std::shared_ptr<Plane> getRandomPlane();
+    static std::shared_ptr<Plane> getRandomPlane(std::shared_ptr<RandomGenerators> aRandomGenerator);
 };
 
 // Function to test some functionality of the Plane class

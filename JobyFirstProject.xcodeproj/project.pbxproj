@@ -15,6 +15,7 @@
 		838D6FD92D42CCE9006B64C7 /* PlaneQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FCA2D42CCE9006B64C7 /* PlaneQueue.cpp */; };
 		838D6FDA2D42CCE9006B64C7 /* SimClock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FCC2D42CCE9006B64C7 /* SimClock.cpp */; };
 		838D6FDB2D42CCE9006B64C7 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838D6FCF2D42CCE9006B64C7 /* Simulation.cpp */; };
+		83F26BFB2D5E7F7B008AF524 /* RandomGenerators.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83F26BFA2D5E7F7B008AF524 /* RandomGenerators.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -51,6 +52,8 @@
 		838D6FCD2D42CCE9006B64C7 /* SimSettings.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SimSettings.hpp; sourceTree = "<group>"; };
 		838D6FCE2D42CCE9006B64C7 /* Simulation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Simulation.hpp; sourceTree = "<group>"; };
 		838D6FCF2D42CCE9006B64C7 /* Simulation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
+		83F26BF92D5E7F7B008AF524 /* RandomGenerators.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RandomGenerators.hpp; sourceTree = "<group>"; };
+		83F26BFA2D5E7F7B008AF524 /* RandomGenerators.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RandomGenerators.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -119,6 +122,8 @@
 				838D6FCB2D42CCE9006B64C7 /* SimClock.hpp */,
 				838D6FCC2D42CCE9006B64C7 /* SimClock.cpp */,
 				838D6FCF2D42CCE9006B64C7 /* Simulation.cpp */,
+				83F26BF92D5E7F7B008AF524 /* RandomGenerators.hpp */,
+				83F26BFA2D5E7F7B008AF524 /* RandomGenerators.cpp */,
 			);
 			path = Simulation;
 			sourceTree = "<group>";
@@ -203,6 +208,7 @@
 				838D6FD92D42CCE9006B64C7 /* PlaneQueue.cpp in Sources */,
 				838D6FDA2D42CCE9006B64C7 /* SimClock.cpp in Sources */,
 				838D6FDB2D42CCE9006B64C7 /* Simulation.cpp in Sources */,
+				83F26BFB2D5E7F7B008AF524 /* RandomGenerators.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

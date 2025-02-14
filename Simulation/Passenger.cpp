@@ -6,26 +6,26 @@
 //
 
 #include <stdio.h>
-#include <random>
 #include "Passenger.hpp"
+#include "PlaneQueue.hpp"
 
+extern PlaneSpecification planeSpecifications[];
 
-std::random_device Passenger::a_random_device;
-std::mt19937 Passenger::generator(useRandomSeed ? useRandomSeed : a_random_device());
 
 // This is called at the start of each flight to get the number of passengers.
 // There is an alternative controlled by the passengerCountOption setting.
 // The default value (0) is to always fly with a full plane.
 // If passengerCountOption == 1 then each plane files with a randome number
 // of passengers in the range [1 - maxPassengers].
-long Passenger::getPassengerCount(long maxPassengers,  std::shared_ptr<SimSettings> theSettings) {
+long Passenger::getPassengerCount(Company aCompany, Simulation *theSimulation) {
+    
     // if there are no settings or the option is 0, planes fly full
-    if(theSettings == nullptr || theSettings->passengerCountOption == 0) {
-        return maxPassengers;
+    if(theSimulation == nullptr || theSimulation->theSettings == nullptr ||
+       theSimulation->theRandomGenerators == nullptr || theSimulation->theSettings->passengerCountOption == 0) {
+        return planeSpecifications[aCompany].passenger_count;
     }
     // Get a random number of passengers in [1 - maxPassengers]
-    std::uniform_int_distribution<> passengerDistribution(1, static_cast<int>(maxPassengers));
-    return passengerDistribution(generator);
+    return theSimulation->theRandomGenerators->getRandomPassengerCount(aCompany);
 };
 
 // This determines how long a delay there will be for a particular flight.
@@ -35,12 +35,12 @@ long Passenger::getPassengerCount(long maxPassengers,  std::shared_ptr<SimSettin
 // then each time a plane is put in PlaneQueue it is given a delay for passengers arriving
 // in the range [0 - maxPassengerDelay]. Planes that are grounded are also put into
 // PlaneQueue, but are given a dealy of LONG_MAX so they never are assigned to a flight.
-long Passenger::getPassengerDelay(long maxPassengerDelay) {
+long Passenger::getPassengerDelay(long maxPassengerDelay, Simulation *theSimulation) {
     // If the maximum delay is not greater than 0 then there is no delay
-    if(maxPassengerDelay <= 0) {
+    if(maxPassengerDelay <= 0 || theSimulation == nullptr ||
+       theSimulation->theRandomGenerators == nullptr) {
         return 0;
     }
-    // Get a random number of delays in [0 - maxPassengerDelay]
-    std::uniform_int_distribution<> delayDistribution(0, static_cast<int>(maxPassengerDelay));
-    return delayDistribution(generator);
+        // Get a random number of delays in [0 - maxPassengerDelay]
+    return theSimulation->theRandomGenerators->getRandomPassengerDelay();
 }
