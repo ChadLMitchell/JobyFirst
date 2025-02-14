@@ -13,6 +13,7 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include <future>
 #include "SimSettings.hpp"
 
 /*
@@ -125,6 +126,7 @@ public:
     // This function runs the simulation and returns the results
     std::vector<FinalStats> run(bool verbose);
     
+    std::future<std::vector<FinalStats>> runAsync(bool verbose);
     // How often do we show progress indicator (<= 0 means not at all)
     // This decides it based on settings
     long getProgressInterval();

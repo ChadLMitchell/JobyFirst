@@ -12,6 +12,8 @@
 #include <string>
 #include <chrono>
 #include <iomanip>
+#include <future>
+#include <stdexcept>
 #include "DebugHelp.hpp"
 #include "CmdLineMenus.hpp"
 #include "TestsMenu.hpp"
@@ -268,13 +270,21 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
 
     // The Simulator function times individual simulations, but this will time the series
     auto startTimer = std::chrono::high_resolution_clock::now();
+
+    std::array<std::future<std::vector<FinalStats>>, runCount> asyncFunctions;
+    std::array<std::shared_ptr<Simulation>, runCount> simulations;
     
-    // Repeat the simulation with the current parameters
+    // Launch the simulations with the current parameters asynchronously
     for(int run = 0; run < runCount; run++) {
         // run each simulation
-        Simulation aSimulation(runSettings);
-        std::vector<FinalStats> results = aSimulation.run(false);
-
+        simulations[run] = std::make_shared<Simulation>(runSettings);
+        asyncFunctions[run] = simulations[run]->runAsync(false);
+    }
+    for(int run = 0; run < runCount; run++) {
+        if(!asyncFunctions[run].valid()) {
+            throw std::runtime_error("The future for simulation #" + std::to_string(run) + " is not valid.");
+        }
+        std::vector<FinalStats> results = asyncFunctions[run].get();
         // accumulate the results
         // TO-DO: Faily confident that none of these overflow the capacity of long and double as we
         // go, but with a higher runCount that could be a problem. Need to add checking to make

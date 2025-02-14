@@ -12,6 +12,7 @@
 #include "SimSettings.hpp"
 #include <iomanip>
 #include <chrono>
+#include <future>
 
 /*
  *******************************************************************************************
@@ -57,7 +58,10 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     auto stopTimer = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
     double secondsTaken = duration.count() / 1000000.0;
-    std::cout << "Time taken by simulation: "
+
+    // accumulate output in to buffer for now so we can do an atomic output
+    std::stringstream buffer;
+    buffer << "Time taken by simulation: "
     << duration.count() << " microseconds ("
     << secondsTaken << " seconds)" << std::endl;
 
@@ -74,7 +78,7 @@ std::vector<FinalStats> Simulation::run(bool verbose)
         totalChargerStats[c].theCompany = c;
     }
     if(verbose) {
-        std::cout << "***** List of flights *****" << std::endl;
+        buffer << "***** List of flights *****" << std::endl;
     }
     // Total the statistics from each flight
     for(FlightStats f: theFlightStats) {
@@ -97,8 +101,8 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     }
     
     if(verbose) {
-        std::cout << std::endl;
-        std::cout << "***** List of charges *****" << std::endl;
+        buffer << std::endl;
+        buffer << "***** List of charges *****" << std::endl;
     }
     // Total the statistics from each charge
     for(ChargerStats cs: theChargerStats) {
@@ -116,7 +120,7 @@ std::vector<FinalStats> Simulation::run(bool verbose)
         }
     }
     if(verbose) {
-        std::cout << std::endl;
+        buffer << std::endl;
     }
 
 
@@ -159,13 +163,17 @@ std::vector<FinalStats> Simulation::run(bool verbose)
     
     // Output a short summary of the overall simulation.
     // We let the caller output the more detailed statistics.
-    std::cout << "Final simulated time: " << theSimClock->getTime() <<
+    buffer << "Final simulated time: " << theSimClock->getTime() <<
     (secondsPerMinute == 60 ? " seconds (" : " minutes (") <<
     theSimClock->getTime()/(secondsPerHourD) << " hours)" << std::endl;
-    std::cout << totalFlights << " flights and " << totalCharges << " charges" << std::endl;
-    std::cout << std::endl;
+    buffer << totalFlights << " flights and " << totalCharges << " charges" << std::endl;
+    buffer << std::endl;
+    std::cout << buffer.str();
     
     return returnValue;
+}
+std::future<std::vector<FinalStats>> Simulation::runAsync(bool verbose) {
+    return std::async([this, verbose]{return this->run(verbose);});
 }
 
 // How often do we show progress indicator (<= 0 means not at all)
