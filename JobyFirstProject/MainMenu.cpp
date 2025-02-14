@@ -48,9 +48,9 @@ void outputSettings(const SimSettings &s)
 // This function displays the results of a simulation run.
 // The results vector could be that returned directly from Simulation.run(),
 // but it could also be summary of a series of simulations.
-void outputResults(std::vector<FinalStats> results)
+void outputResultsHeader()
 {
-// For reference, the structure is copied here during development and to help understand the code
+    // For reference, the structure is copied here during development and to help understand the code
     // struct FinalStats {
     //      Company theCompany;
     //      long totalFlights;
@@ -84,7 +84,43 @@ void outputResults(std::vector<FinalStats> results)
     << left << setw(8) << "Faults "
     << left << setw(15) << "Passenger Miles"
     << endl;
+}
+void outputResults(std::vector<FinalStats> results)
+{
+    // Display the results for each company
+    for(auto r: results) {
+        cout << setprecision(2) << fixed
+        << left << setw(17) << companyName(r.theCompany)
+        << left << setw(9) << r.totalFlights
+        << left << setw(13) << r.averageTimePerFlight
+        << left << setw(14) << r.averageDistancePerFlight
+        << left << setw(9) << r.totalCharges
+        << left << setw(13) << r.averageTimeCharging
+        << left << setw(17) << r.averageTimeChargingWithWait
+        << left << setw(8) << r.totalFaults
+        << left << setw(15) << r.totalPassengerMiles
+        << endl;
+    }
 
+}
+// This is almost the same as FinalStats except that we use double for several fields that were long
+// When we average those long values we want to be able to display double values
+struct AverageStats {
+    Company theCompany; // Enum id of the plane's company
+    double totalFlights; // How many flights for this plane type?
+    double averageTimePerFlight; // Average time per flight
+    double averageDistancePerFlight; // Average distance per flight
+    double totalCharges; // How many charges did planes of this type receive?
+    double averageTimeCharging; // What was the average time to charge?
+    double averageTimeChargingWithWait; // What was the average time to charge including waiting time?
+    double totalFaults; // How many faults were experienced by planes of this kind
+    double totalPassengerMiles; // Total passenger miles (computed for each flight)
+                                // You could compute them from other fields, but only if
+                                // You are sure that each plane flies completely full.
+                                // We have options where that is not true.
+};
+void outputAverageResults(std::vector<AverageStats> results)
+{
     // Display the results for each company
     for(auto r: results) {
         cout << setprecision(2) << fixed
@@ -200,6 +236,7 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
     
     outputSettings(runSettings);
     cout << "Results for this simulation run:" << endl;
+    outputResultsHeader();
     outputResults(results);
 
     return false;
@@ -222,10 +259,10 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
 
     const int runCount = 100;
     
-    // Set up accumulators for the stats
-    std::vector<FinalStats> accumulatedStats;
+   // Set up accumulators for the stats
+    std::vector<AverageStats> accumulatedStats;
     for(auto c: allCompany) {
-        FinalStats f{c};
+        AverageStats f{c};
         accumulatedStats.push_back(f);
     }
 
@@ -286,7 +323,8 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
     }
     outputSettings(runSettings);
     cout << "Average results for " << runCount << " simulation runs:" << endl;
-    outputResults(accumulatedStats);
+    outputResultsHeader();
+    outputAverageResults(accumulatedStats);
 
     return false;
 }
