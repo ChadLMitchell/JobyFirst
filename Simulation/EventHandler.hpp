@@ -14,6 +14,7 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include <atomic>
 
 /*
  *******************************************************************************************
@@ -29,7 +30,7 @@ class EventHandler {
 protected:
     long nextEventTime; // this is the next time this handler wants to be called
     long handlerNumber;// Each handler is assigned a handler number (mostly for testing)
-    static int NextHandlerNumber; // Keep track of next number to assign
+    static std::atomic_int NextHandlerNumber; // Keep track of next number to assign
 public:
     EventHandler(long nextEventTime);
     virtual ~EventHandler();

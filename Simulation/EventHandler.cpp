@@ -17,7 +17,7 @@
  * As nextEventTime arrves, the SimClock will call handleEvent() to process that event.
  *******************************************************************************************
  */
-int EventHandler::NextHandlerNumber = 1; // We use this static member to keep track of next number to assign
+std::atomic_int EventHandler::NextHandlerNumber{1}; // We use this static member to keep track of next number to assign
 EventHandler::EventHandler(long nextEventTime):  nextEventTime{nextEventTime} {
     handlerNumber = NextHandlerNumber++;
 }

@@ -13,6 +13,8 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include <atomic>
+
 #include "SimSettings.hpp"
 #include "RandomGenerators.hpp"
 
@@ -59,7 +61,7 @@ class Plane {
                             // fault we decrement this inteval by the duration of the
                             // flight passed without a fault.
     int planeNumber; // Each plane is assigned a plane number (mostly for testing)
-    static int NextPlaneNumber; // Keep track of next number to assign
+    static std::atomic_int NextPlaneNumber; // Keep track of next number to assign
 public:
     Plane(PlaneSpecification &spec, std::shared_ptr<RandomGenerators> aRandomGenerators);
     ~Plane();

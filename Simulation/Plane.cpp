@@ -5,7 +5,6 @@
 //  Created by Chad Mitchell on 1/18/25.
 //
 
-#include <random>
 #include "Plane.hpp"
 #include "Passenger.hpp"
 #include "RandomGenerators.hpp"
@@ -50,7 +49,7 @@ PlaneSpecification planeSpecifications[]{
 };
 
 // Each plane is assigned a plane number (mostly for testing)
-int Plane::NextPlaneNumber = 1; // We use this static member to keep track of next number to assign
+std::atomic_int Plane::NextPlaneNumber{1}; // We use this static member to keep track of next number to assign
 Plane::Plane(PlaneSpecification &spec, std::shared_ptr<RandomGenerators> aRandomGenerators): mySpecs(spec), theRandomGenerators{aRandomGenerators} {
     // To aoid divide by 0 and other silly errors
     // we should validate specs before creating Plane, this is extra checking
