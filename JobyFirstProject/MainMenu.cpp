@@ -246,7 +246,11 @@ bool runSimulation(int selector, MenuGroup &thisMenuGroup) {
 
 // Run multiple simulations (specified in runCount) and then average the results.
 bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
-    debugMessage("===> Selected Run Multiple Simulations");
+    if(selector == 1) {
+        debugMessage("===> Selected Run Multiple Simulations Concurrently");
+    } else {
+        debugMessage("===> Selected Run Multiple Simulations Sequentially");
+    }
 
     // Make a copy of the current settings so any changes we make here are
     // temporary and do not affect future simulations. This function does not
@@ -275,16 +279,25 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
     std::array<std::shared_ptr<Simulation>, runCount> simulations;
     
     // Launch the simulations with the current parameters asynchronously
-    for(int run = 0; run < runCount; run++) {
-        // run each simulation
-        simulations[run] = std::make_shared<Simulation>(runSettings);
-        asyncFunctions[run] = simulations[run]->runAsync(false);
+    if(selector == 1) {
+        for(int run = 0; run < runCount; run++) {
+            // run each simulation
+            simulations[run] = std::make_shared<Simulation>(runSettings);
+            asyncFunctions[run] = simulations[run]->runAsync(false);
+        }
     }
     for(int run = 0; run < runCount; run++) {
-        if(!asyncFunctions[run].valid()) {
-            throw std::runtime_error("The future for simulation #" + std::to_string(run) + " is not valid.");
+        std::vector<FinalStats> results;
+        if(selector == 1) {
+            // Simulations already running concurrently. Bring the resutls back to thei thread.
+            if(!asyncFunctions[run].valid()) {
+                throw std::runtime_error("The future for simulation #" + std::to_string(run) + " is not valid.");
+            }
+            results = asyncFunctions[run].get();
+        } else {
+            Simulation aSimulation(runSettings);
+            results = aSimulation.run(false);
         }
-        std::vector<FinalStats> results = asyncFunctions[run].get();
         // accumulate the results
         // TO-DO: Faily confident that none of these overflow the capacity of long and double as we
         // go, but with a higher runCount that could be a problem. Need to add checking to make
@@ -313,8 +326,13 @@ bool runMultiple(int selector, MenuGroup &thisMenuGroup) {
     auto stopTimer = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTimer - startTimer);
     double secondsTaken = duration.count() / 1000000.0;
-    std::cout << "Total time taken by all simulations: "
-    << duration.count() << " microseconds ("
+    std::cout << "Total time taken by all " << runCount << " simulations ";
+    if(selector == 1) {
+        std::cout << "run concurrently: ";
+    } else {
+        std::cout << "run sequentially: ";
+    }
+    std::cout << duration.count() << " microseconds ("
     << secondsTaken << " seconds)" << std::endl;
 
     // turn totals into averages
@@ -349,7 +367,8 @@ bool doQuit(int selector, MenuGroup &thisMenuGroup) {
 vector<MenuItem> mainMenus {
     MenuItem('E', string{"Edit Settings"}, &editSettings, 0),
     MenuItem('R', string{"Run Simulation with Current Settings"}, &runSimulation, 0),
-    MenuItem('A', string{"Average results from 100 Simulations"}, &runMultiple, 0),
+    MenuItem('A', string{"Average results from 100 Simulations Run Sequentially"}, &runMultiple, 0),
+    MenuItem('C', string{"Average results from 100 Simulations Run Concurrently"}, &runMultiple, 1),
     MenuItem('V', string{"Run Simulation Verbose with Current Settings"}, &runSimulation, 1),
     MenuItem('T', string{"Run Tests"}, &runTests, 0),
     MenuItem('-', string{""}, nullptr, 0),
